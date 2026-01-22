@@ -1,4 +1,4 @@
-# SAAGAA Web
+# SAAGAA
 
 Modern responsive website for SAAGAA Unisex Salon & Spa.
 
