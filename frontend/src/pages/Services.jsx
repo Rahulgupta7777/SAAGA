@@ -76,9 +76,9 @@ const ServicesFull = () => {
     const isSelected = (itemName) => selectedServices.some(s => s.name === itemName);
 
     return (
-        <div className="min-h-screen bg-cream text-brown-900 font-sans selection:bg-brown-900 selection:text-white pb-32">
-            <div className="bg-cream">
-                <Navbar showLogo={true} />
+        <div className="min-h-screen bg-cream text-brown-900 font-sans selection:bg-brown-900 selection:text-white pb-0">
+            <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex flex-col snap-start">
+                <Navbar showLogo={true} onOpenBooking={() => setIsBookingOpen(true)} />
             </div>
 
             <BookingModal 

@@ -3,7 +3,7 @@ import { Menu, X } from 'lucide-react';
 
 import { Link } from 'react-router-dom';
 
-const Navbar = ({ showLogo = false }) => {
+const Navbar = ({ showLogo = false, onOpenBooking }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
@@ -28,7 +28,7 @@ const Navbar = ({ showLogo = false }) => {
                     <a href="/#shop" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">shop</a>
                     <a href="/#offers" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">offers</a>
                     <a href="/#locate" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">locate us</a>
-                    <a href="/#schedule" className="px-8 py-3 text-base text-brown-900 font-medium tracking-[0.5px] border border-brown-600 rounded-full hover:bg-brown-600 hover:text-white transition-all duration-300">
+                    <a href="/schedule" className="px-8 py-3 text-base text-brown-900 font-medium tracking-[0.5px] border border-brown-600 rounded-full hover:bg-brown-600 hover:text-white transition-all duration-300">
                         Schedule Visit
                     </a>
                 </div>
@@ -56,9 +56,15 @@ const Navbar = ({ showLogo = false }) => {
                     <a href="#shop" onClick={() => setIsMenuOpen(false)} className="text-brown-900 text-3xl font-serif">Shop</a>
                     <a href="#offers" onClick={() => setIsMenuOpen(false)} className="text-brown-900 text-3xl font-serif">Offers</a>
                     <a href="#locate" onClick={() => setIsMenuOpen(false)} className="text-brown-900 text-3xl font-serif">Locate Us</a>
-                    <a href="#schedule" onClick={() => setIsMenuOpen(false)} className="mt-4 px-10 py-4 text-lg text-brown-900 border border-brown-900 rounded-full">
+                    <button 
+                        onClick={() => {
+                            setIsMenuOpen(false);
+                            if (onOpenBooking) onOpenBooking();
+                        }} 
+                        className="mt-4 px-10 py-4 text-lg text-brown-900 border border-brown-900 rounded-full"
+                    >
                         Schedule Visit
-                    </a>
+                    </button>
                 </div>
             </div>
         </nav>
