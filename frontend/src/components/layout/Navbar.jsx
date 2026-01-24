@@ -1,26 +1,37 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
-const Navbar = () => {
+import { Link } from 'react-router-dom';
+
+const Navbar = ({ showLogo = false }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
         <nav className="flex justify-between md:justify-center items-center py-6 md:py-10 w-full px-6 relative z-50">
 
-            {/* Mobile Logo/Brand (Optional, if needed for mobile left alignment) */}
-            <div className="md:hidden font-serif text-2xl text-brown-900">
+            {/* Mobile Logo/Brand */}
+            <Link to="/" className="md:hidden font-serif text-2xl text-brown-900">
                 SAAGAA
-            </div>
+            </Link>
 
             {/* Desktop Menu */}
-            <div className="hidden md:flex gap-16 lg:gap-24 items-center justify-center w-full">
-                <a href="#services" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">services</a>
-                <a href="#shop" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">shop</a>
-                <a href="#offers" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">offers</a>
-                <a href="#locate" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">locate us</a>
-                <a href="#schedule" className="px-8 py-3 text-base text-brown-900 font-medium tracking-[0.5px] border border-brown-600 rounded-full hover:bg-brown-600 hover:text-white transition-all duration-300">
-                    Schedule Visit
-                </a>
+            <div className={`hidden md:flex items-center w-full ${showLogo ? 'justify-between' : 'justify-center gap-16 lg:gap-24'}`}>
+                
+                {showLogo && (
+                     <Link to="/" className="font-serif text-3xl font-bold text-brown-900 tracking-widest">
+                        SAAGAA
+                    </Link>
+                )}
+
+                <div className={`flex items-center ${showLogo ? 'gap-12' : 'gap-16 lg:gap-24'}`}>
+                    <Link to="/services" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">services</Link>
+                    <a href="/#shop" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">shop</a>
+                    <a href="/#offers" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">offers</a>
+                    <a href="/#locate" className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity">locate us</a>
+                    <a href="/#schedule" className="px-8 py-3 text-base text-brown-900 font-medium tracking-[0.5px] border border-brown-600 rounded-full hover:bg-brown-600 hover:text-white transition-all duration-300">
+                        Schedule Visit
+                    </a>
+                </div>
             </div>
 
             {/* Mobile Hamburger Button */}
