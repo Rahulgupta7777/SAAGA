@@ -244,7 +244,7 @@ const BookingModal = ({ isOpen, onClose, selectedServices }) => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-brown-900 uppercase tracking-wider mb-2">Phone Number (Optional)</label>
+                                    <label className="block text-xs font-bold text-brown-900 uppercase tracking-wider mb-2">Phone Number</label>
                                     <input 
                                         type="tel" 
                                         placeholder="e.g. +91 98765 43210"

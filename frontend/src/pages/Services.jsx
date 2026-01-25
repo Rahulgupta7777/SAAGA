@@ -133,13 +133,14 @@ const ServicesFull = () => {
                                 <button
                                     key={service.id}
                                     onClick={() => scrollToCategory(service.id)}
-                                    className={`text-left px-5 py-3 rounded-xl text-sm tracking-wide transition-all duration-300 font-medium border border-transparent ${
+                                    className={`text-left px-5 py-3 rounded-lg text-base tracking-wide transition-all duration-300 font-serif border border-transparent flex justify-between items-center group ${
                                         activeCategory === service.id 
-                                            ? 'bg-brown-900 text-white shadow-lg translate-x-2' 
-                                            : 'text-brown-700 hover:bg-brown-900/5 hover:border-brown-900/10'
+                                            ? 'bg-brown-900 text-white shadow-md translate-x-2' 
+                                            : 'text-brown-600 hover:bg-brown-900/5 hover:text-brown-900'
                                     }`}
                                 >
                                     {service.category}
+                                    {activeCategory === service.id && <span className="w-1.5 h-1.5 rounded-full bg-white ml-2"></span>}
                                 </button>
                             ))}
                         </nav>
