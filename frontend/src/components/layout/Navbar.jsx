@@ -68,7 +68,7 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
           </Link>
           <button
             onClick={handleBookingClick}
-            className="px-8 py-3 text-base text-brown-900 font-medium tracking-[0.5px] border border-brown-600 rounded-full hover:bg-brown-600 hover:text-white transition-all duration-300"
+            className="px-8 py-3 text-base text-brown-900 font-medium tracking-[0.5px] border border-brown-600 rounded-full hover:bg-brown-600 hover:text-white transition-all duration-300 ring-1 ring-brown-900 ring-offset-2 ring-offset-[#FAF9F6]"
           >
             {activeBooking ? "My Schedule" : "Schedule Visit"}
           </button>
@@ -128,7 +128,7 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
               setIsMenuOpen(false);
               handleBookingClick();
             }}
-            className="mt-4 px-10 py-4 text-lg text-brown-900 border border-brown-900 rounded-full"
+            className="mt-4 px-10 py-4 text-lg text-brown-900 border border-brown-900 rounded-full ring-1 ring-brown-900 ring-offset-2 ring-offset-[#FAF9F6]"
           >
             {activeBooking ? "My Schedule" : "Schedule Visit"}
           </button>
