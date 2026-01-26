@@ -7,7 +7,7 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <nav className={`flex justify-between md:justify-center items-center py-4 md:py-6 w-full max-w-full z-50 ${showLogo ? 'border-b border-brown-900/10' : ''}`}>
+        <nav className={`flex justify-between md:justify-center items-center py-4 md:py-6 px-6 md:px-12 w-full max-w-full z-50 ${showLogo ? 'border-b border-brown-900/10' : ''}`}>
 
             {/* Mobile Logo/Brand */}
             <Link to="/" className="md:hidden font-serif text-2xl text-brown-900">
