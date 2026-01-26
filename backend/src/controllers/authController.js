@@ -1,32 +1,40 @@
 import Otp from "../models/Otp.js";
-import User from "../models/User.js"; 
+import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import { sendWhatsappOtp } from "../utils/WhatsApp.js";
 
-// 1. Send OTP
-exports.sendOtp = async (req, res) => {
+// Helper: Generate Token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
+// 1. Send OTP (Customer)
+export const sendOtp = async (req, res) => {
   const { phone } = req.body;
   try {
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString(); // Make sure my Meta Template name in the dashboard (e.g., auth_otp) matches exactly with this variable name
+    // Generate 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Save to DB (Update if exists, create if new)
+    // Save/Update in DB
     await Otp.findOneAndUpdate(
       { phone },
       { code: otpCode, createdAt: Date.now() },
-      { upsert: true },
+      { upsert: true }, // Create if doesn't exist
     );
 
-    // Send via WhatsApp
+    // Trigger WhatsApp API
     await sendWhatsappOtp(phone, otpCode);
 
     res.status(200).json({ success: true, message: "OTP sent successfully" });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Send OTP Error:", error);
+    res.status(500).json({ success: false, message: "Failed to send OTP" });
   }
 };
 
-// 2. Verify OTP & Login
-exports.verifyOtp = async (req, res) => {
+// 2. Verify OTP & Login (Customer)
+export const verifyOtp = async (req, res) => {
   const { phone, otp } = req.body;
   try {
     const validOtp = await Otp.findOne({ phone, code: otp });
@@ -36,17 +44,45 @@ exports.verifyOtp = async (req, res) => {
         .json({ success: false, message: "Invalid or Expired OTP" });
     }
 
-    // Find or Create User
+    // Check if User exists, else create
     let user = await User.findOne({ phone });
     if (!user) {
-      user = await User.create({ phone });
+      user = await User.create({ phone, role: "user" });
     }
 
-    // Generate Token (Valid for 7 days)
-    const token = jwt.sign({ id: user._id, phone }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = generateToken(user._id);
 
+    // Clean up OTP
+    await Otp.deleteOne({ _id: validOtp._id });
+
+    res.status(200).json({ success: true, token, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// 3. Admin Login (Email/Pass)
+export const adminLogin = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+
+    // Check Email & Role
+    if (!user || user.role !== "admin") {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid admin credentials" });
+    }
+
+    // Check Password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
+    }
+
+    const token = generateToken(user._id);
     res.status(200).json({ success: true, token, user });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

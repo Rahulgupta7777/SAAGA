@@ -1,0 +1,147 @@
+import Appointment from "../models/Appointment.js";
+import BlockedSlot from "../models/BlockedSlot.js";
+import Service from "../models/Service.js";
+import Product from "../models/Product.js";
+import User from "../models/User.js";
+import Staff from "../models/Staff.js";
+import { sendWhatsappOtp } from "../utils/WhatsApp.js"; // We might need a separate template for confirmation
+
+// Helper: Get Time Slots (10 AM - 8 PM)
+const generateTimeSlots = () => {
+  const slots = [];
+  const startHour = 10;
+  const endHour = 20; // 8 PM
+  for (let i = startHour; i < endHour; i++) {
+    const hour = i === 12 ? 12 : i % 12;
+    const ampm = i < 12 ? "AM" : "PM";
+    slots.push(`${hour}:00 ${ampm}`);
+    slots.push(`${hour}:30 ${ampm}`);
+  }
+  return slots;
+};
+
+// 1. Get Available Slots
+export const getSlots = async (req, res) => {
+  const { date } = req.query; // Expect ISO Date string or YYYY-MM-DD
+  if (!date) return res.status(400).json({ message: "Date is required" });
+
+  try {
+    const queryDate = new Date(date);
+    const startOfDay = new Date(queryDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(queryDate.setHours(23, 59, 59, 999));
+
+    // A. Generate All Slots
+    let availableSlots = generateTimeSlots();
+
+    // B. Fetch Booked Slots (Active)
+    const appointments = await Appointment.find({
+      date: { $gte: startOfDay, $lte: endOfDay },
+      status: { $ne: "cancelled" },
+    });
+    const bookedSlots = appointments.map((appt) => appt.timeSlot);
+
+    // C. Fetch Blocked Slots (Admin)
+    const blocked = await BlockedSlot.find({
+      date: { $gte: startOfDay, $lte: endOfDay },
+    });
+    const blockedTimes = blocked.map((b) => b.timeSlot);
+
+    // D. Filter Logic
+    availableSlots = availableSlots.filter(
+      (slot) => !bookedSlots.includes(slot) && !blockedTimes.includes(slot),
+    );
+
+    res.status(200).json({ date, slots: availableSlots });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 2. Create Booking
+export const createBooking = async (req, res) => {
+  const { userId, date, timeSlot, services, products, staffId } = req.body;
+
+  try {
+    // A. Concurrency Check (Is slot still free?)
+    const existing = await Appointment.findOne({
+      date: new Date(date),
+      timeSlot,
+      status: { $ne: "cancelled" },
+    });
+    if (existing) {
+      return res
+        .status(409)
+        .json({ message: "Slot already booked. Please choose another." });
+    }
+
+    const blocked = await BlockedSlot.findOne({
+      date: new Date(date),
+      timeSlot,
+    });
+    if (blocked) {
+      return res.status(409).json({ message: "Slot is unavailable." });
+    }
+
+    // B. Calculate TOTAL Price (Securely from Backend)
+    let totalAmount = 0;
+
+    // Services
+    if (services && services.length > 0) {
+      for (const item of services) {
+        // STRICT RULE: Only allowing booking of Active services
+        const service = await Service.findOne({
+          _id: item.serviceId,
+          isActive: true,
+        });
+        if (!service)
+          throw new Error(`Service not available: ${item.serviceId}`);
+
+        totalAmount +=
+          item.variant === "male" ? service.prices.male : service.prices.female;
+      }
+    }
+
+    // Products
+    if (products && products.length > 0) {
+      for (const prodId of products) {
+        const product = await Product.findOne({ _id: prodId, isActive: true });
+        if (!product) throw new Error(`Product not available: ${prodId}`);
+        totalAmount += product.price;
+
+        // Decreasing Stock 
+        await Product.findByIdAndUpdate(prodId, { $inc: { stock: -1 } });
+
+      }
+    }
+
+    // C. Create Appointment
+    const appointment = await Appointment.create({
+      user: userId,
+      date: new Date(date),
+      timeSlot,
+      services,
+      products,
+      staff: staffId,
+      totalAmount,
+      status: "booked",
+    });
+
+    try {
+      const user = await User.findById(userId);
+      if (user) {
+        // TODO: Create a separate 'booking_confirmed' template function in WhatsApp.js
+        // await sendWhatsappConfirmation(user.phone, date, timeSlot);
+      }
+    } catch (notifyError) {
+      console.error(
+        "Notification Failed (Booking still successful):",
+        notifyError.message,
+      );
+    }
+
+    res.status(201).json({ success: true, appointment });
+  } catch (error) {
+    console.error("Booking Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
