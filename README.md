@@ -48,7 +48,6 @@ git clone git@github.com:Rahulgupta7777/SAAGA.git
 cd SAAGA 
 # Frontend
 cd frontend
-npm ci                    # or pnpm install --frozen-lockfile ```
 npm run dev
 
 ```
@@ -58,6 +57,11 @@ npm run dev
 cd ../backend
 npm ci
 npm start
+```
+
+# admin 
+```
+added
 ```
 
 ## Build for production
