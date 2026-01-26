@@ -21,10 +21,10 @@ export const servicesData = [
       {
         title: "Nail Membership",
         items: [
-            { name: "Gel Polish Hands Yearly", price: "15000" },
-            { name: "Gel Polish Feet Yearly", price: "14000" },
-            { name: "Gel Polish Combo Yearly", price: "12000" },
-            { name: "Extension Yearly Subscription", price: "20000" },
+          { name: "Gel Polish Hands Yearly", price: "15000" },
+          { name: "Gel Polish Feet Yearly", price: "14000" },
+          { name: "Gel Polish Combo Yearly", price: "12000" },
+          { name: "Extension Yearly Subscription", price: "20000" },
         ]
       }
     ]
@@ -122,32 +122,32 @@ export const servicesData = [
     category: "Hair Color",
     id: "hair-color",
     subsections: [
-        {
-            title: "Schwarzkopf",
-            items: [
-                { name: "Creative Ombre", price: "7000" },
-                { name: "Creative Balayage", price: "6000" },
-                { name: "Global (M/F)", price: "2000 / 5000" },
-                { name: "Highlights Global", price: "5000" },
-                { name: "Root Refresh (M/F)", price: "1500 / 2000" },
-                { name: "Color Chunks", price: "800" },
-                { name: "Beard Color", price: "600" },
-                { name: "Highlights", price: "500" },
-            ]
-        },
-        {
-            title: "Morfose",
-            items: [
-                { name: "Creative Ombre", price: "6000" },
-                { name: "Creative Balayage", price: "5000" },
-                { name: "Global (M/F)", price: "1500 / 4000" },
-                { name: "Highlights Global", price: "4500" },
-                { name: "Root Refresh (M/F)", price: "1200 / 1500" },
-                { name: "Color Chunks", price: "600" },
-                { name: "Beard Color", price: "400" },
-                { name: "Highlights", price: "400" },
-            ]
-        }
+      {
+        title: "Schwarzkopf",
+        items: [
+          { name: "Creative Ombre", price: "7000" },
+          { name: "Creative Balayage", price: "6000" },
+          { name: "Global (M/F)", price: "2000 / 5000" },
+          { name: "Highlights Global", price: "5000" },
+          { name: "Root Refresh (M/F)", price: "1500 / 2000" },
+          { name: "Color Chunks", price: "800" },
+          { name: "Beard Color", price: "600" },
+          { name: "Highlights", price: "500" },
+        ]
+      },
+      {
+        title: "Morfose",
+        items: [
+          { name: "Creative Ombre", price: "6000" },
+          { name: "Creative Balayage", price: "5000" },
+          { name: "Global (M/F)", price: "1500 / 4000" },
+          { name: "Highlights Global", price: "4500" },
+          { name: "Root Refresh (M/F)", price: "1200 / 1500" },
+          { name: "Color Chunks", price: "600" },
+          { name: "Beard Color", price: "400" },
+          { name: "Highlights", price: "400" },
+        ]
+      }
     ]
   },
   {
@@ -175,38 +175,38 @@ export const servicesData = [
     category: "Body Care (Wax)",
     id: "wax",
     subsections: [
-        {
-            title: "Rica Wax",
-            items: [
-                { name: "Full Body (M/F)", price: "4500 / 3000" },
-                { name: "Full Front/Back (M/F)", price: "1000 / 600" },
-                { name: "Full Arms (M/F)", price: "1000 / 500" },
-                { name: "Full Legs (M/F)", price: "1500 / 1000" },
-            ]
-        },
-        {
-            title: "Honey Wax",
-            items: [
-                { name: "Full Body (M/F)", price: "3500 / 2000" },
-                { name: "Full Front/Back", price: "800 / 400" },
-                { name: "Full Arms", price: "700 / 300" },
-                { name: "Full Legs", price: "900 / 500" },
-                { name: "Underarms", price: "250 / 100" },
-            ]
-        },
-        {
-            title: "Stripless Wax",
-            items: [
-                { name: "Extra", price: "2000" },
-                { name: "Full Face", price: "500" },
-                { name: "Underarms", price: "300 / 200" },
-                { name: "Sideburns", price: "200" },
-                { name: "Eyebrows", price: "150" },
-                { name: "Upper Lip", price: "150" },
-                { name: "Chin Wax", price: "150" },
-                { name: "Forehead Wax", price: "150" },
-            ]
-        }
+      {
+        title: "Rica Wax",
+        items: [
+          { name: "Full Body (M/F)", price: "4500 / 3000" },
+          { name: "Full Front/Back (M/F)", price: "1000 / 600" },
+          { name: "Full Arms (M/F)", price: "1000 / 500" },
+          { name: "Full Legs (M/F)", price: "1500 / 1000" },
+        ]
+      },
+      {
+        title: "Honey Wax",
+        items: [
+          { name: "Full Body (M/F)", price: "3500 / 2000" },
+          { name: "Full Front/Back", price: "800 / 400" },
+          { name: "Full Arms", price: "700 / 300" },
+          { name: "Full Legs", price: "900 / 500" },
+          { name: "Underarms", price: "250 / 100" },
+        ]
+      },
+      {
+        title: "Stripless Wax",
+        items: [
+          { name: "Extra", price: "2000" },
+          { name: "Full Face", price: "500" },
+          { name: "Underarms", price: "300 / 200" },
+          { name: "Sideburns", price: "200" },
+          { name: "Eyebrows", price: "150" },
+          { name: "Upper Lip", price: "150" },
+          { name: "Chin Wax", price: "150" },
+          { name: "Forehead Wax", price: "150" },
+        ]
+      }
     ]
   },
   {
@@ -245,28 +245,28 @@ export const servicesData = [
     category: "Hands & Feet",
     id: "hands-feet",
     subsections: [
-        {
-            title: "Manicure",
-            items: [
-                { name: "AVL Luxury", price: "2500 / 2400" },
-                { name: "Kan Biscotti", price: "2000 / 2200" },
-                { name: "Bombini Icecream", price: "1600 / 1600" },
-                { name: "AVL Express", price: "1400 / 1200" },
-                { name: "Signature", price: "1200 / 1000" },
-                { name: "Classic", price: "1000 / 900" },
-            ]
-        },
-        {
-            title: "Pedicure",
-            items: [
-                { name: "AVL Luxury", price: "2800 / 2600" },
-                { name: "Biscotti", price: "2400 / 2200" },
-                { name: "Bombini", price: "2200 / 1800" },
-                { name: "AVL Express", price: "2000 / 1400" },
-                { name: "Signature", price: "1800 / 1200" },
-                { name: "Classic", price: "1500 / 1000" },
-            ]
-        }
+      {
+        title: "Manicure",
+        items: [
+          { name: "AVL Luxury", price: "2500 / 2400" },
+          { name: "Kan Biscotti", price: "2000 / 2200" },
+          { name: "Bombini Icecream", price: "1600 / 1600" },
+          { name: "AVL Express", price: "1400 / 1200" },
+          { name: "Signature", price: "1200 / 1000" },
+          { name: "Classic", price: "1000 / 900" },
+        ]
+      },
+      {
+        title: "Pedicure",
+        items: [
+          { name: "AVL Luxury", price: "2800 / 2600" },
+          { name: "Biscotti", price: "2400 / 2200" },
+          { name: "Bombini", price: "2200 / 1800" },
+          { name: "AVL Express", price: "2000 / 1400" },
+          { name: "Signature", price: "1800 / 1200" },
+          { name: "Classic", price: "1500 / 1000" },
+        ]
+      }
     ]
   },
   {
@@ -285,74 +285,74 @@ export const servicesData = [
     category: "His Packages",
     id: "his-packages",
     subsections: [
-        {
-            title: "Advance – 2500",
-            items: [
-                { name: "Shampoo & Conditioning" },
-                { name: "Haircut" },
-                { name: "Beard" },
-                { name: "Brightening Cleanup" },
-                { name: "Hair Colour" },
-                { name: "Beard Colour" },
-            ]
-        },
-        {
-            title: "Signature – 2000",
-            items: [
-                { name: "Shampoo & Conditioning" },
-                { name: "Haircut" },
-                { name: "Beard" },
-                { name: "Anti Tan Cleanup" },
-                { name: "L’Oreal Signature Cream Bath" },
-            ]
-        },
-        {
-            title: "Classic – 1600",
-            items: [
-                { name: "Shampoo & Conditioning" },
-                { name: "Haircut" },
-                { name: "Beard" },
-                { name: "Amino Nourish Hair" },
-                { name: "Detan Mask" },
-            ]
-        }
+      {
+        title: "Advance – 2500",
+        items: [
+          { name: "Shampoo & Conditioning" },
+          { name: "Haircut" },
+          { name: "Beard" },
+          { name: "Brightening Cleanup" },
+          { name: "Hair Colour" },
+          { name: "Beard Colour" },
+        ]
+      },
+      {
+        title: "Signature – 2000",
+        items: [
+          { name: "Shampoo & Conditioning" },
+          { name: "Haircut" },
+          { name: "Beard" },
+          { name: "Anti Tan Cleanup" },
+          { name: "L’Oreal Signature Cream Bath" },
+        ]
+      },
+      {
+        title: "Classic – 1600",
+        items: [
+          { name: "Shampoo & Conditioning" },
+          { name: "Haircut" },
+          { name: "Beard" },
+          { name: "Amino Nourish Hair" },
+          { name: "Detan Mask" },
+        ]
+      }
     ]
   },
   {
     category: "Her Packages",
     id: "her-packages",
     subsections: [
-        {
-            title: "Advance – 12000",
-            items: [
-                { name: "Pro Glow / O3 Bridal Bright" },
-                { name: "Stripless Wax Full Face" },
-                { name: "Bom Mani Pedi & Feet Gel Polish" },
-                { name: "Gel Extensions" },
-                { name: "3TENX Hair Revive Therapy" },
-                { name: "Full Arms & Legs Rica" },
-            ]
-        },
-        {
-            title: "Signature – 6000",
-            items: [
-                { name: "Express Facial" },
-                { name: "Full Arms & Legs Rica" },
-                { name: "Signature Mani Pedi" },
-                { name: "Hands Gel Polish" },
-                { name: "L’Oreal Signature Cream Bath" },
-            ]
-        },
-        {
-            title: "Classic – 4000",
-            items: [
-                { name: "Glow Boost Cleanup" },
-                { name: "Full Face Bleach" },
-                { name: "Full Arms & Legs Rica" },
-                { name: "Amino Nourish Hair Spa" },
-                { name: "Hands Gel Polish" },
-            ]
-        }
+      {
+        title: "Advance – 12000",
+        items: [
+          { name: "Pro Glow / O3 Bridal Bright" },
+          { name: "Stripless Wax Full Face" },
+          { name: "Bom Mani Pedi & Feet Gel Polish" },
+          { name: "Gel Extensions" },
+          { name: "3TENX Hair Revive Therapy" },
+          { name: "Full Arms & Legs Rica" },
+        ]
+      },
+      {
+        title: "Signature – 6000",
+        items: [
+          { name: "Express Facial" },
+          { name: "Full Arms & Legs Rica" },
+          { name: "Signature Mani Pedi" },
+          { name: "Hands Gel Polish" },
+          { name: "L’Oreal Signature Cream Bath" },
+        ]
+      },
+      {
+        title: "Classic – 4000",
+        items: [
+          { name: "Glow Boost Cleanup" },
+          { name: "Full Face Bleach" },
+          { name: "Full Arms & Legs Rica" },
+          { name: "Amino Nourish Hair Spa" },
+          { name: "Hands Gel Polish" },
+        ]
+      }
     ]
   }
 ];
