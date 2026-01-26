@@ -122,7 +122,7 @@ export const getDashboardStats = async (req, res) => {
 export const getAllBookings = async (req, res) => {
   try {
     const bookings = await Appointment.find()
-      .populate("user", "phone")
+      .populate("userId", "phone")
       .populate({ path: "services.serviceId", select: "name" })
       .populate("staff", "name")
       .sort({ date: -1 });

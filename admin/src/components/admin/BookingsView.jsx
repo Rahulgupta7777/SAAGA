@@ -53,11 +53,12 @@ const BookingsView = () => {
                                     <div className="mt-2 flex items-center space-x-6">
                                         <div className="flex items-center text-gray-700">
                                             <User className="mr-2 h-4 w-4" />
-                                            <span className="font-semibold">{booking.user?.name || booking.user?.phone}</span>
+                                            {/* Backend populates 'userId', not 'user' */}
+                                            <span className="font-semibold">{booking.userId?.name || booking.userId?.phone || 'Unknown User'}</span>
                                         </div>
                                         <div className="flex items-center text-gray-700">
                                             <Phone className="mr-2 h-4 w-4" />
-                                            <span>{booking.user?.phone}</span>
+                                            <span>{booking.userId?.phone || 'N/A'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -79,8 +80,10 @@ const BookingsView = () => {
                                 <ul className="mt-2 space-y-1 text-sm text-gray-600">
                                     {booking.services.map((svc, idx) => (
                                         <li key={`svc-${idx}`} className="flex justify-between">
-                                            <span>{svc.name} (Service)</span>
-                                            <span>₹{svc.price}</span>
+                                            {/* Access nested serviceId and handle nulls */}
+                                            <span>{svc.serviceId?.name || "Deleted Service"} ({svc.variant})</span>
+                                            {/* Price is not stored in appointment service item currently, defaulting to N/A or removing */}
+                                            {/* <span>₹{svc.price}</span> -- Price is missing in mismatch */}
                                         </li>
                                     ))}
                                     {booking.products.map((prd, idx) => (
