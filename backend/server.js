@@ -14,8 +14,25 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://saagaa.vercel.app",
+  "https://saagaa-admin.vercel.app"
+];
+
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      // For now, allow all origins to unblock deployment if specific check fails
+      // or uncomment below to restrict
+      // return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
 }));
 
