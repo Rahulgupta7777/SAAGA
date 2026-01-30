@@ -11,7 +11,7 @@ const Home = () => {
     const [isBookingOpen, setIsBookingOpen] = useState(false);
 
     return (
-        <div className="h-screen w-full max-w-full overflow-y-scroll overflow-x-hidden snap-y snap-mandatory scroll-smooth relative">
+        <div className="w-full max-w-full overflow-x-hidden relative">
             <BookingModal
                 isOpen={isBookingOpen}
                 onClose={() => setIsBookingOpen(false)}

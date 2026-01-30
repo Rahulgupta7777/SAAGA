@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, X, GripVertical, FolderPlus, Move } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, GripVertical, FolderPlus, Move, Loader2 } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import api from '../../utils/api';
 
@@ -25,6 +25,8 @@ const ServicesManager = () => {
     const [newSubcategory, setNewSubcategory] = useState('');
     const [addingSubcategoryTo, setAddingSubcategoryTo] = useState(null); // categoryId
     const [editingSubcategory, setEditingSubcategory] = useState(null); // { catId: '...', oldName: '...', newName: '...' }
+
+    const [loading, setLoading] = useState(true);
 
     // Reorder Categories Modal State
     const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
@@ -131,6 +133,7 @@ const ServicesManager = () => {
 
     const fetchServices = async () => {
         try {
+            setLoading(true);
             const [servicesRes, categoriesRes] = await Promise.all([
                 api.services.getAll(),
                 api.categories.getAll()
@@ -144,6 +147,8 @@ const ServicesManager = () => {
             setCategories(groupServicesByCategory(servicesData, categoriesData));
         } catch (error) {
             console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -481,247 +486,202 @@ const ServicesManager = () => {
             </div>
 
             {/* Services grouped by category with drag and drop */}
-            <DragDropContext onDragEnd={handleDragEnd}>
-                <div className="flex flex-col gap-16">
-                    {categories.map((category, categoryIdx) => (
-                        <section key={categoryIdx} className="scroll-mt-40">
-                            {/* Category Header with Image */}
-                            <div className="mb-8 rounded-3xl overflow-hidden relative h-48 md:h-56 shadow-xl group">
-                                <img
-                                    src={category.image}
-                                    alt={category.name}
-                                    className="w-full h-full object-cover object-center"
-                                    onError={(e) => {
-                                        e.target.src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80';
-                                    }}
-                                />
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-between px-8 backdrop-blur-[2px]">
-                                    <div>
-                                        <h3 className="font-serif text-3xl md:text-4xl text-white tracking-wide drop-shadow-lg">
-                                            {category.name}
-                                        </h3>
-                                        <p className="text-white/80 text-sm mt-2 drop-shadow">
-                                            {category.services.length} {category.services.length === 1 ? 'service' : 'services'}
-                                        </p>
-                                    </div>
-                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={() => openServiceModal(null, category.name)}
-                                            className="bg-white/90 text-brown-900 p-3 rounded-full hover:bg-white transition-all shadow-lg"
-                                            title="Add service to this category"
-                                        >
-                                            <Plus className="h-5 w-5" />
-                                        </button>
-                                        <button
-                                            onClick={() => setAddingSubcategoryTo(category._id)}
-                                            className="bg-white/90 text-brown-900 p-3 rounded-full hover:bg-white transition-all shadow-lg"
-                                            title="Add subcategory"
-                                        >
-                                            <FolderPlus className="h-5 w-5" />
-                                        </button>
-                                        {category._id && (
+            {/* Services grouped by category with drag and drop */}
+            {loading ? (
+                <div className="flex justify-center items-center py-20">
+                    <Loader2 className="h-10 w-10 animate-spin text-brown-900" />
+                </div>
+            ) : (
+                <DragDropContext onDragEnd={handleDragEnd}>
+                    <div className="flex flex-col gap-16">
+                        {categories.map((category, categoryIdx) => (
+                            <section key={categoryIdx} className="scroll-mt-40">
+                                {/* Category Header with Image */}
+                                <div className="mb-8 rounded-3xl overflow-hidden relative h-48 md:h-56 shadow-xl group">
+                                    <img
+                                        src={category.image}
+                                        alt={category.name}
+                                        className="w-full h-full object-cover object-center"
+                                        onError={(e) => {
+                                            e.target.src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80';
+                                        }}
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-between px-8 backdrop-blur-[2px]">
+                                        <div>
+                                            <h3 className="font-serif text-3xl md:text-4xl text-white tracking-wide drop-shadow-lg">
+                                                {category.name}
+                                            </h3>
+                                            <p className="text-white/80 text-sm mt-2 drop-shadow">
+                                                {category.services.length} {category.services.length === 1 ? 'service' : 'services'}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
-                                                onClick={() => openCategoryModal(category)}
+                                                onClick={() => openServiceModal(null, category.name)}
                                                 className="bg-white/90 text-brown-900 p-3 rounded-full hover:bg-white transition-all shadow-lg"
-                                                title="Edit category"
+                                                title="Add service to this category"
                                             >
-                                                <Edit2 className="h-5 w-5" />
+                                                <Plus className="h-5 w-5" />
                                             </button>
-                                        )}
+                                            <button
+                                                onClick={() => setAddingSubcategoryTo(category._id)}
+                                                className="bg-white/90 text-brown-900 p-3 rounded-full hover:bg-white transition-all shadow-lg"
+                                                title="Add subcategory"
+                                            >
+                                                <FolderPlus className="h-5 w-5" />
+                                            </button>
+                                            {category._id && (
+                                                <button
+                                                    onClick={() => openCategoryModal(category)}
+                                                    className="bg-white/90 text-brown-900 p-3 rounded-full hover:bg-white transition-all shadow-lg"
+                                                    title="Edit category"
+                                                >
+                                                    <Edit2 className="h-5 w-5" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Category Sub-Groups */}
-                            <div className="space-y-4">
-                                {(() => {
-                                    // 1. Group services dynamically
-                                    const groups = {};
-                                    // Initialize with defined subcategories to ensure order
-                                    (category.subcategories || []).forEach(sub => {
-                                        groups[sub.name] = [];
-                                    });
-                                    // Add services to groups
-                                    category.services.forEach(service => {
-                                        const subName = service.subcategory || '';
-                                        if (!groups[subName]) {
-                                            groups[subName] = [];
-                                        }
-                                        groups[subName].push(service);
-                                    });
+                                {/* Category Sub-Groups */}
+                                <div className="space-y-4">
+                                    {(() => {
+                                        // 1. Group services dynamically
+                                        const groups = {};
+                                        // Initialize with defined subcategories to ensure order
+                                        (category.subcategories || []).forEach(sub => {
+                                            groups[sub.name] = [];
+                                        });
+                                        // Add services to groups
+                                        category.services.forEach(service => {
+                                            const subName = service.subcategory || '';
+                                            if (!groups[subName]) {
+                                                groups[subName] = [];
+                                            }
+                                            groups[subName].push(service);
+                                        });
 
-                                    // 2. Determine display order
-                                    const definedOrder = (category.subcategories || []).map(s => s.name);
-                                    const allGroupNames = Object.keys(groups).filter(name => name !== ''); // Exclude General for now
-                                    // Sort: defined ones first (in order), then others alphabetically
-                                    const sortedGroupNames = allGroupNames.sort((a, b) => {
-                                        const idxA = definedOrder.indexOf(a);
-                                        const idxB = definedOrder.indexOf(b);
-                                        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-                                        if (idxA !== -1) return -1;
-                                        if (idxB !== -1) return 1;
-                                        return a.localeCompare(b);
-                                    });
+                                        // 2. Determine display order
+                                        const definedOrder = (category.subcategories || []).map(s => s.name);
+                                        const allGroupNames = Object.keys(groups).filter(name => name !== ''); // Exclude General for now
+                                        // Sort: defined ones first (in order), then others alphabetically
+                                        const sortedGroupNames = allGroupNames.sort((a, b) => {
+                                            const idxA = definedOrder.indexOf(a);
+                                            const idxB = definedOrder.indexOf(b);
+                                            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                                            if (idxA !== -1) return -1;
+                                            if (idxB !== -1) return 1;
+                                            return a.localeCompare(b);
+                                        });
 
-                                    // 3. Render Groups
-                                    return (
-                                        <>
-                                            {/* Add Subcategory Input */}
-                                            {addingSubcategoryTo === category._id && (
-                                                <div className="mt-6 mb-8 pl-2 animate-in fade-in slide-in-from-top-4 duration-300">
-                                                    <div className="flex items-center gap-2 max-w-md">
-                                                        <input
-                                                            type="text"
-                                                            value={newSubcategory}
-                                                            onChange={(e) => setNewSubcategory(e.target.value)}
-                                                            className="text-2xl font-serif text-brown-900 bg-transparent border-b-2 border-brown-900 px-0 py-1 w-full focus:outline-none placeholder-brown-300"
-                                                            placeholder="New Subcategory Name"
-                                                            autoFocus
-                                                            onKeyPress={(e) => e.key === 'Enter' && handleCreateSubcategory(category._id)}
-                                                        />
-                                                        <button
-                                                            onClick={() => handleCreateSubcategory(category._id)}
-                                                            className="p-2 text-green-600 hover:bg-green-50 rounded-full"
-                                                            title="Create"
-                                                        >
-                                                            <Plus className="h-5 w-5" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => {
-                                                                setAddingSubcategoryTo(null);
-                                                                setNewSubcategory('');
-                                                            }}
-                                                            className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-                                                            title="Cancel"
-                                                        >
-                                                            <X className="h-5 w-5" />
-                                                        </button>
+                                        // 3. Render Groups
+                                        return (
+                                            <>
+                                                {/* Add Subcategory Input */}
+                                                {addingSubcategoryTo === category._id && (
+                                                    <div className="mt-6 mb-8 pl-2 animate-in fade-in slide-in-from-top-4 duration-300">
+                                                        <div className="flex items-center gap-2 max-w-md">
+                                                            <input
+                                                                type="text"
+                                                                value={newSubcategory}
+                                                                onChange={(e) => setNewSubcategory(e.target.value)}
+                                                                className="text-2xl font-serif text-brown-900 bg-transparent border-b-2 border-brown-900 px-0 py-1 w-full focus:outline-none placeholder-brown-300"
+                                                                placeholder="New Subcategory Name"
+                                                                autoFocus
+                                                                onKeyPress={(e) => e.key === 'Enter' && handleCreateSubcategory(category._id)}
+                                                            />
+                                                            <button
+                                                                onClick={() => handleCreateSubcategory(category._id)}
+                                                                className="p-2 text-green-600 hover:bg-green-50 rounded-full"
+                                                                title="Create"
+                                                            >
+                                                                <Plus className="h-5 w-5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setAddingSubcategoryTo(null);
+                                                                    setNewSubcategory('');
+                                                                }}
+                                                                className="p-2 text-red-600 hover:bg-red-50 rounded-full"
+                                                                title="Cancel"
+                                                            >
+                                                                <X className="h-5 w-5" />
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                )}
 
-                                            {/* Subcategories */}
-                                            {sortedGroupNames.map(subName => {
-                                                const subcatServices = groups[subName];
-                                                const isEditing = editingSubcategory?.catId === category._id && editingSubcategory?.oldName === subName;
+                                                {/* Subcategories */}
+                                                {sortedGroupNames.map(subName => {
+                                                    const subcatServices = groups[subName];
+                                                    const isEditing = editingSubcategory?.catId === category._id && editingSubcategory?.oldName === subName;
 
-                                                return (
-                                                    <div key={subName} className="mt-6 mb-2 group/sub pl-2">
-                                                        <div className="flex items-center justify-between mb-3">
-                                                            {isEditing ? (
-                                                                <div className="flex items-center gap-2 flex-1">
-                                                                    <input
-                                                                        type="text"
-                                                                        value={editingSubcategory.newName}
-                                                                        onChange={(e) => setEditingSubcategory({ ...editingSubcategory, newName: e.target.value })}
-                                                                        className="text-2xl font-serif text-brown-900 bg-transparent border-b-2 border-brown-900 px-0 py-1 w-full max-w-sm focus:outline-none"
-                                                                        autoFocus
-                                                                        onKeyPress={(e) => e.key === 'Enter' && handleSubcategoryRename()}
-                                                                    />
-                                                                    <button
-                                                                        onClick={handleSubcategoryRename}
-                                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-full"
-                                                                        title="Save"
-                                                                    >
-                                                                        <Plus className="h-5 w-5 rotate-45 transform" />
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => setEditingSubcategory(null)}
-                                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-                                                                        title="Cancel"
-                                                                    >
-                                                                        <X className="h-5 w-5" />
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                <div className="flex items-center gap-3">
-                                                                    <h4 className="text-2xl font-serif text-brown-900">
-                                                                        {subName}
-                                                                    </h4>
-                                                                    <div className="flex opacity-0 group-hover/sub:opacity-100 transition-opacity">
+                                                    return (
+                                                        <div key={subName} className="mt-6 mb-2 group/sub pl-2">
+                                                            <div className="flex items-center justify-between mb-3">
+                                                                {isEditing ? (
+                                                                    <div className="flex items-center gap-2 flex-1">
+                                                                        <input
+                                                                            type="text"
+                                                                            value={editingSubcategory.newName}
+                                                                            onChange={(e) => setEditingSubcategory({ ...editingSubcategory, newName: e.target.value })}
+                                                                            className="text-2xl font-serif text-brown-900 bg-transparent border-b-2 border-brown-900 px-0 py-1 w-full max-w-sm focus:outline-none"
+                                                                            autoFocus
+                                                                            onKeyPress={(e) => e.key === 'Enter' && handleSubcategoryRename()}
+                                                                        />
                                                                         <button
-                                                                            onClick={() => setEditingSubcategory({ catId: category._id, oldName: subName, newName: subName })}
-                                                                            className="p-2 text-brown-400 hover:text-brown-600 rounded-full transition-colors"
-                                                                            title="Rename subcategory"
+                                                                            onClick={handleSubcategoryRename}
+                                                                            className="p-2 text-green-600 hover:bg-green-50 rounded-full"
+                                                                            title="Save"
                                                                         >
-                                                                            <Edit2 className="h-4 w-4" />
+                                                                            <Plus className="h-5 w-5 rotate-45 transform" />
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => handleSubcategoryDelete(category._id, subName)}
-                                                                            className="p-2 text-red-400 hover:text-red-600 rounded-full transition-colors"
-                                                                            title="Delete subcategory"
+                                                                            onClick={() => setEditingSubcategory(null)}
+                                                                            className="p-2 text-red-600 hover:bg-red-50 rounded-full"
+                                                                            title="Cancel"
                                                                         >
-                                                                            <Trash2 className="h-4 w-4" />
+                                                                            <X className="h-5 w-5" />
                                                                         </button>
                                                                     </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <Droppable droppableId={`${category.name}::${subName}`}>
-                                                            {(provided, snapshot) => (
-                                                                <div
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.droppableProps}
-                                                                    className={`min-h-[50px] transition-colors pl-6 border-l-2 border-brown-100 ml-2 ${snapshot.isDraggingOver ? 'bg-brown-50/30 rounded-lg' : ''}`}
-                                                                >
-                                                                    {subcatServices.length === 0 ? (
-                                                                        <div className="text-center py-4 text-brown-300 italic text-sm">
-                                                                            <p>No services</p>
+                                                                ) : (
+                                                                    <div className="flex items-center gap-3">
+                                                                        <h4 className="text-2xl font-serif text-brown-900">
+                                                                            {subName}
+                                                                        </h4>
+                                                                        <div className="flex opacity-0 group-hover/sub:opacity-100 transition-opacity">
+                                                                            <button
+                                                                                onClick={() => setEditingSubcategory({ catId: category._id, oldName: subName, newName: subName })}
+                                                                                className="p-2 text-brown-400 hover:text-brown-600 rounded-full transition-colors"
+                                                                                title="Rename subcategory"
+                                                                            >
+                                                                                <Edit2 className="h-4 w-4" />
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => handleSubcategoryDelete(category._id, subName)}
+                                                                                className="p-2 text-red-400 hover:text-red-600 rounded-full transition-colors"
+                                                                                title="Delete subcategory"
+                                                                            >
+                                                                                <Trash2 className="h-4 w-4" />
+                                                                            </button>
                                                                         </div>
-                                                                    ) : (
-                                                                        <div className="space-y-0">
-                                                                            {subcatServices.map((service, index) => (
-                                                                                <ServiceItem
-                                                                                    key={service._id}
-                                                                                    service={service}
-                                                                                    index={index}
-                                                                                    openServiceModal={openServiceModal}
-                                                                                    handleServiceDelete={handleServiceDelete}
-                                                                                    formatPrice={formatPrice}
-                                                                                />
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                    {provided.placeholder}
-                                                                </div>
-                                                            )}
-                                                        </Droppable>
-                                                    </div>
-                                                );
-                                            })}
-
-                                            {/* General / Uncategorized */}
-                                            {(() => {
-                                                const generalServices = groups[''] || [];
-                                                // Always show General area if it has services OR if there are no subcategories at all (to allow dropping)
-                                                // OR if the user just wants a "Catch all" area.
-                                                // The image shows a flat list if no subcats.
-                                                // If there ARE subcats, General should be labeled "General" or similar?
-                                                // User wants a TREE. So General services are just siblings to Subcategory Folders? Or separate?
-                                                // Let's create a "General" group at the bottom if needed.
-
-                                                if (generalServices.length > 0 || sortedGroupNames.length > 0) {
-                                                    return (
-                                                        <div className="mt-8 pl-2">
-                                                            {sortedGroupNames.length > 0 && generalServices.length > 0 && (
-                                                                <h4 className="text-xl font-serif text-brown-800 mb-4 italic opacity-70">
-                                                                    General Services
-                                                                </h4>
-                                                            )}
-                                                            <Droppable droppableId={`${category.name}::`}>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <Droppable droppableId={`${category.name}::${subName}`}>
                                                                 {(provided, snapshot) => (
                                                                     <div
                                                                         ref={provided.innerRef}
                                                                         {...provided.droppableProps}
-                                                                        className={`min-h-[50px] transition-colors ${sortedGroupNames.length > 0 ? 'pl-6 border-l-2 border-brown-100 ml-2' : ''} ${snapshot.isDraggingOver ? 'bg-brown-50/30 rounded-lg' : ''}`}
+                                                                        className={`min-h-[50px] transition-colors pl-6 border-l-2 border-brown-100 ml-2 ${snapshot.isDraggingOver ? 'bg-brown-50/30 rounded-lg' : ''}`}
                                                                     >
-                                                                        {generalServices.length === 0 ? (
-                                                                            <div className="text-center py-6 text-brown-300 italic text-sm">
-                                                                                {sortedGroupNames.length === 0 ? <p>Drop services here</p> : <p>Drop general services here</p>}
+                                                                        {subcatServices.length === 0 ? (
+                                                                            <div className="text-center py-4 text-brown-300 italic text-sm">
+                                                                                <p>No services</p>
                                                                             </div>
                                                                         ) : (
                                                                             <div className="space-y-0">
-                                                                                {generalServices.map((service, index) => (
+                                                                                {subcatServices.map((service, index) => (
                                                                                     <ServiceItem
                                                                                         key={service._id}
                                                                                         service={service}
@@ -739,30 +699,82 @@ const ServicesManager = () => {
                                                             </Droppable>
                                                         </div>
                                                     );
-                                                }
-                                                return null;
-                                            })()}
-                                        </>
-                                    );
-                                })()}
-                            </div>
-                        </section>
-                    ))}
+                                                })}
 
-                    {categories.length === 0 && (
-                        <div className="text-center py-20">
-                            <p className="text-xl text-brown-600 mb-6">No categories yet. Add your first category to get started!</p>
-                            <button
-                                onClick={() => openCategoryModal()}
-                                className="bg-brown-900 text-white px-8 py-4 rounded-full font-medium hover:bg-brown-800 transition-all shadow-lg"
-                            >
-                                <FolderPlus className="inline h-5 w-5 mr-2" />
-                                Add First Category
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </DragDropContext>
+                                                {/* General / Uncategorized */}
+                                                {(() => {
+                                                    const generalServices = groups[''] || [];
+                                                    // Always show General area if it has services OR if there are no subcategories at all (to allow dropping)
+                                                    // OR if the user just wants a "Catch all" area.
+                                                    // The image shows a flat list if no subcats.
+                                                    // If there ARE subcats, General should be labeled "General" or similar?
+                                                    // User wants a TREE. So General services are just siblings to Subcategory Folders? Or separate?
+                                                    // Let's create a "General" group at the bottom if needed.
+
+                                                    if (generalServices.length > 0 || sortedGroupNames.length > 0) {
+                                                        return (
+                                                            <div className="mt-8 pl-2">
+                                                                {sortedGroupNames.length > 0 && generalServices.length > 0 && (
+                                                                    <h4 className="text-xl font-serif text-brown-800 mb-4 italic opacity-70">
+                                                                        General Services
+                                                                    </h4>
+                                                                )}
+                                                                <Droppable droppableId={`${category.name}::`}>
+                                                                    {(provided, snapshot) => (
+                                                                        <div
+                                                                            ref={provided.innerRef}
+                                                                            {...provided.droppableProps}
+                                                                            className={`min-h-[50px] transition-colors ${sortedGroupNames.length > 0 ? 'pl-6 border-l-2 border-brown-100 ml-2' : ''} ${snapshot.isDraggingOver ? 'bg-brown-50/30 rounded-lg' : ''}`}
+                                                                        >
+                                                                            {generalServices.length === 0 ? (
+                                                                                <div className="text-center py-6 text-brown-300 italic text-sm">
+                                                                                    {sortedGroupNames.length === 0 ? <p>Drop services here</p> : <p>Drop general services here</p>}
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div className="space-y-0">
+                                                                                    {generalServices.map((service, index) => (
+                                                                                        <ServiceItem
+                                                                                            key={service._id}
+                                                                                            service={service}
+                                                                                            index={index}
+                                                                                            openServiceModal={openServiceModal}
+                                                                                            handleServiceDelete={handleServiceDelete}
+                                                                                            formatPrice={formatPrice}
+                                                                                        />
+                                                                                    ))}
+                                                                                </div>
+                                                                            )}
+                                                                            {provided.placeholder}
+                                                                        </div>
+                                                                    )}
+                                                                </Droppable>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })()}
+                                            </>
+                                        );
+                                    })()}
+                                </div>
+                            </section>
+                        ))}
+
+                        {categories.length === 0 && (
+                            <div className="text-center py-20">
+                                <p className="text-xl text-brown-600 mb-6">No categories yet. Add your first category to get started!</p>
+                                <button
+                                    onClick={() => openCategoryModal()}
+                                    className="bg-brown-900 text-white px-8 py-4 rounded-full font-medium hover:bg-brown-800 transition-all shadow-lg"
+                                >
+                                    <FolderPlus className="inline h-5 w-5 mr-2" />
+                                    Add First Category
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </DragDropContext>
+            )}
 
             {/* Service Modal - Minimal Design */}
             {isServiceModalOpen && (
