@@ -22,7 +22,7 @@
 
 @layer base {
   html {
-    @apply overflow-x-hidden w-full;
+    @apply overflow-x-hidden overflow-y-scroll w-full scroll-smooth snap-y snap-mandatory;
   }
 
   body {

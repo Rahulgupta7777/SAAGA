@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Check, Plus } from "lucide-react";
+import { Check, Plus, Loader2 } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import BookingModal from "../components/booking/BookingModal";
 import waxImage from "../assets/wax_service.png";
@@ -172,6 +172,21 @@ const ServicesFull = () => {
     const itemName = variant ? `${item.name} (${variant})` : item.name;
     return selectedServices.some((s) => s.name === itemName);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-cream">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-cream">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-10">
+            <Navbar showLogo={true} />
+          </div>
+        </div>
+        <div className="pt-32 flex justify-center items-center min-h-[60vh]">
+          <Loader2 className="h-10 w-10 animate-spin text-brown-900" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-cream text-brown-900 font-sans selection:bg-brown-900 selection:text-white pb-0">

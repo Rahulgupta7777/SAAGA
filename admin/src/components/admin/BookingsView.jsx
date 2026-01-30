@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Phone } from 'lucide-react';
+import { Calendar, Clock, User, Phone, Loader2 } from 'lucide-react';
 import api from '../../utils/api';
 
 const BookingsView = () => {
     const [bookings, setBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchBookings();
@@ -11,11 +12,15 @@ const BookingsView = () => {
 
     const fetchBookings = async () => {
         try {
+            setLoading(true);
             const res = await api.bookings.getAll();
             const data = await res.json();
             setBookings(data);
+
         } catch (error) {
             console.error('Error fetching bookings:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -31,7 +36,11 @@ const BookingsView = () => {
         <div>
             <h2 className="mb-6 text-2xl font-bold text-gray-800">All Appointment Bookings</h2>
 
-            {bookings.length === 0 ? (
+            {loading ? (
+                <div className="flex justify-center items-center py-20">
+                    <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
+                </div>
+            ) : bookings.length === 0 ? (
                 <div className="text-center py-10 text-gray-500">
                     No bookings found yet.
                 </div>
