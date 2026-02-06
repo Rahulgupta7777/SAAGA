@@ -22,48 +22,55 @@ const generateTimeSlots = () => {
 };
 
 export const getSlots = async (req, res) => {
-  const { date, staffId, serviceIds } = req.query; // serviceIds is comma-separated string
+  const { date, staffId, serviceIds } = req.query; // serviceIds is comma-separated string, remember
   if (!date || !serviceIds)
     return res.status(400).json({ message: "Date and Services required" });
 
   try {
-    // A. Calculate Total Duration
-    const services = await Service.find({
-      _id: { $in: serviceIds.split(",") },
-    });
-    const totalDuration = services.reduce(
-      (acc, s) => acc + (s.duration || 30),
-      0,
-    );
+    // Calculate Total Duration
+    const services = await Service.find({_id: { $in: serviceIds.split(",") }}); 
+    const totalDuration = services.reduce((acc, s) => acc + (s.duration || 30),0 );
     const slotsNeeded = Math.ceil(totalDuration / 30);
+
+    const allSlots = generateTimeSlots();
 
     const queryDate = new Date(date);
     const startOfDay = new Date(queryDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(queryDate.setHours(23, 59, 59, 999));
 
-    // B. Get Constraints
     const appointments = await Appointment.find({
       date: { $gte: startOfDay, $lte: endOfDay },
       status: { $ne: "cancelled" },
-      ...(staffId && { staff: staffId }), // Filter by staff if selected
     });
 
-    const blocks = await BlockedSlot.find({
-      date: { $gte: startOfDay, $lte: endOfDay },
-      $or: [{ staffId: null }, { staffId: staffId }], // Global blocks OR specific staff blocks
-    });
+    let eligibleStaff = [];
+    if (staffId) {
+      eligibleStaff = [staffId];
+    } else {
+      const staffMembers = await Staff.find({ isActive: true });
+      eligibleStaff = staffMembers.map((s) => s._id.toString());
+    }
 
-    // C. Logic: Find consecutive free slots
-    // This requires a loop through your generateTimeSlots() array
-    // checking if index [i], [i+1]... [i+slotsNeeded-1] are all free.
-    // (Pseudocode implemented in full project)
+    const availableSlots = [];
 
-    // For now, return basic filtered slots to prevent crash
-    res.json({
-      date,
-      slots: [],
-      message: "Smart slot logic to be implemented with utility functions",
-    });
+    for (let i = 0; i <= allSlots.length - slotsNeeded; i++) {
+      const timeChunk = allSlots.slice(i, i + slotsNeeded); // e.g., ["10:00", "10:30"]
+
+      // Check if AT LEAST ONE staff member is free for the ENTIRE chunk
+      const hasFreeStaff = eligibleStaff.some((sId) => {
+        // Check if this specific staff member is busy in ANY of the required slots
+        const isBusy = appointments.some(
+          (appt) =>
+            appt.staff.toString() === sId && timeChunk.includes(appt.timeSlot),
+        );
+        return !isBusy;
+      });
+
+      if (hasFreeStaff) {
+        availableSlots.push(allSlots[i]);
+      }
+    }
+    res.json({ date, slots: availableSlots });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -75,7 +82,31 @@ export const createBooking = async (req, res) => {
   session.startTransaction()
   try {
     const { userId, date, timeSlot, services, products, staffId } = req.body;
-    // A. Concurrency Check (Is slot still free?)
+
+    if (!staffId) {
+      // Find a staff member who is active AND free at this time
+      const activeStaff = await Staff.find({ isActive: true });
+
+      // Get all bookings at this time
+      const busyStaffIds = await Appointment.find({
+        date: new Date(date),
+        timeSlot: timeSlot,
+        status: { $ne: "cancelled" },
+      }).distinct("staff"); // Get list of busy staff IDs
+
+      // Finding someone who is NOT in the busy list
+      const availableStaff = activeStaff.find(
+        (s) => !busyStaffIds.map((id) => id.toString()).includes(s._id.toString()));
+
+      if (!availableStaff) {
+        return res
+          .status(409)
+          .json({ message: "No staff available at this time." });
+      }
+
+      staffId = availableStaff._id; 
+    }
+    // Checking if slot still free or not.
     const existing = await Appointment.findOne({
       date: new Date(date),
       timeSlot,
@@ -97,7 +128,7 @@ export const createBooking = async (req, res) => {
         .json({ message: "Slot already booked/Unavailable. Please choose another." });
     }
 
-    // B. Calculate TOTAL Price (Securely from Backend)
+    // Calculate totlal Price (Securely from Backend)
     let totalAmount = 0;
 
     // Services
@@ -122,7 +153,6 @@ export const createBooking = async (req, res) => {
         if (!product) throw new Error(`Product not available: ${prodId}`);
         totalAmount += product.price;
 
-        // Decreasing Stock
         await Product.findByIdAndUpdate(prodId, { $inc: { stock: -1 } }, {session});
       }
     }
