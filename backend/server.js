@@ -7,6 +7,7 @@ import authRoutes from "./src/routes/authRoutes.js";
 import publicRoutes from "./src/routes/publicRoutes.js";
 import bookingRoutes from "./src/routes/bookingRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
+import staffRoutes from "./src/routes/staffRoute.js";
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/public", publicRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/staff", staffRoutes);
 
 app.get("/", (req, res) => {
   res.send("SAAGA Backend Running");

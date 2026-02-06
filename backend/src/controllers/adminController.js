@@ -129,8 +129,14 @@ export const getStaff = async (req, res) => {
 // --- Blocked Slots ---
 export const blockSlot = async (req, res) => {
   try {
-    const { date, timeSlot, reason } = req.body;
-    const blocked = await BlockedSlot.create({ date, timeSlot, reason });
+    const { date, timeSlot, reason, staffId } = req.body;
+    // staffId can be null (Global) or an ID (Specific)
+    const blocked = await BlockedSlot.create({
+      date,
+      timeSlot,
+      reason,
+      staffId,
+    });
     res.status(201).json(blocked);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -228,7 +234,10 @@ export const promoteUser = async (req, res) => {
   const { email } = req.body;
 
   // Super Admin Check
-  if (req.user.email !== process.env.SUPER_ADMIN_EMAIL && req.user.code !== process.env.SUPER_ADMIN_SECRET) {
+  if (
+    req.user.email !== process.env.SUPER_ADMIN_EMAIL &&
+    req.user.code !== process.env.SUPER_ADMIN_SECRET
+  ) {
     return res
       .status(403)
       .json({ message: "Only Super Admin can promote users." });
@@ -330,5 +339,26 @@ export const adminCreateBooking = async (req, res) => {
     res.status(status).json({ message: error.message });
   } finally {
     session.endSession();
+  }
+};
+
+export const updateBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { staffId, timeSlot, status, staffNotes } = req.body;
+
+    const updated = await Appointment.findByIdAndUpdate(
+      id,
+      {
+        ...(staffId && { staff: staffId }),
+        ...(timeSlot && { timeSlot }),
+        ...(status && { status }),
+        ...(staffNotes && { staffNotes }),
+      },
+      { new: true },
+    );
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

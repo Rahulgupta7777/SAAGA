@@ -1,6 +1,6 @@
 import express from "express";
 import axios from "axios";
-import { verifyToken, verifyAdmin } from "../middleware/authMiddleware.js";
+import { verifyToken, verifyAdmin, verifyStaff } from "../middleware/authMiddleware.js";
 import {
   createService,
   updateService,
@@ -18,6 +18,9 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
+  promoteUser,
+  adminCreateBooking,
+  updateBooking,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -54,6 +57,9 @@ router.get("/categories", getAllCategories);
 router.post("/categories", createCategory);
 router.put("/categories/:id", updateCategory);
 router.delete("/categories/:id", deleteCategory);
+router.post("/promote-user", promoteUser);
+router.post("/bookings", adminCreateBooking); // Walk-in / Override
+router.put("/bookings/:id", updateBooking); // Reschedule / Reassign
 
 // Image Search Proxy (Pixabay)
 router.get("/search-images", async (req, res) => {
