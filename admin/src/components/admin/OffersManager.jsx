@@ -8,8 +8,8 @@ const OffersManager = () => {
     const [formData, setFormData] = useState({
         title: '',
         code: '',
-        discountType: 'percentage', // or flat
-        discountValue: '',
+        type: 'percentage', // or flat
+        value: '',
         isActive: true
     });
 
@@ -32,7 +32,7 @@ const OffersManager = () => {
         try {
             await api.offers.create(formData);
             setIsModalOpen(false);
-            setFormData({ title: '', code: '', discountType: 'percentage', discountValue: '', isActive: true });
+            setFormData({ title: '', code: '', type: 'percentage', value: '', isActive: true });
             fetchOffers();
         } catch (error) {
             console.error('Error saving offer:', error);
@@ -71,7 +71,7 @@ const OffersManager = () => {
                                 <p className="mt-1 font-mono text-sm text-gray-500 bg-gray-100 inline-block px-2 py-1 rounded">{offer.code}</p>
                                 <div className="mt-4">
                                     <span className="text-2xl font-bold text-green-600">
-                                        {offer.discountType === 'percentage' ? `${offer.discountValue}% OFF` : `₹${offer.discountValue} OFF`}
+                                        {offer.type === 'percentage' ? `${offer.value}% OFF` : `₹${offer.value} OFF`}
                                     </span>
                                 </div>
                             </div>
@@ -108,8 +108,8 @@ const OffersManager = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <select
                                     className="w-full rounded-lg border p-2"
-                                    value={formData.discountType}
-                                    onChange={(e) => setFormData({ ...formData, discountType: e.target.value })}
+                                    value={formData.type}
+                                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                                 >
                                     <option value="percentage">Percentage (%)</option>
                                     <option value="flat">Flat Amount (₹)</option>
@@ -118,14 +118,14 @@ const OffersManager = () => {
                                     type="number"
                                     placeholder="Value"
                                     className="w-full rounded-lg border p-2"
-                                    value={formData.discountValue}
-                                    onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
+                                    value={formData.value}
+                                    onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                                     required
                                 />
                             </div>
                             <button type="submit" className="w-full rounded-lg bg-black py-2 text-white font-bold">
                                 Create Offer
-                            </button>
+                            </button> 
                         </form>
                     </div>
                 </div>

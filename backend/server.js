@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./db.js";
+import cookieParser from "cookie-parser";
 
 import authRoutes from "./src/routes/authRoutes.js";
 import publicRoutes from "./src/routes/publicRoutes.js";
@@ -37,7 +38,9 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use(cookieParser());
 app.use(express.json());
+
 
 // Logging Middleware
 app.use((req, res, next) => {

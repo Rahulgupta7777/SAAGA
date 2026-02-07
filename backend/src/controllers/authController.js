@@ -3,6 +3,7 @@ import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { sendWhatsappOtp } from "../utils/WhatsApp.js";
+import { set } from "mongoose";
 
 // Generate Token
 const generateToken = (id) => {
@@ -57,10 +58,23 @@ export const verifyOtp = async (req, res) => {
     // Clean up OTP
     await Otp.deleteOne({ _id: validOtp._id });
 
-    res.status(200).json({ success: true, token, user });
+    setTokenCookie(res, token);
+
+    res.status(200).json({ success: true, user });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
+};
+
+const setTokenCookie = (res, token) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.cookie("token", token, {
+    httpOnly: true, 
+    secure: isProduction, 
+    sameSite: isProduction ? "none" : "lax", 
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days
+  });
 };
 
 // Admin/Staff Login (Email/Pass)
@@ -88,9 +102,10 @@ export const portalLogin = async (req, res) => {
     }
 
     const token = generateToken(user._id);
+
+    setTokenCookie(res, token);
     res.status(200).json({
       success: true,
-      token,
       user: {
         _id: user._id,
         name: user.name,
@@ -102,5 +117,17 @@ export const portalLogin = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
+};
+
+export const portalLogout = (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  });
+
+  res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
