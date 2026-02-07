@@ -1,94 +1,110 @@
-// API Base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import axios from "axios";
 
-// Helper function to get auth token from localStorage
-const getAuthToken = () => {
-    return localStorage.getItem('adminToken');
-};
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true, // to Send/Receive HttpOnly Cookies
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-// Helper function to create authenticated fetch requests
-const authFetch = async (endpoint, options = {}) => {
-    const token = getAuthToken();
-
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-    };
-
-    // Add Authorization header if token exists
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // If Backend says "Unauthorized" (401), force logout
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("adminUser");
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
     }
+    return Promise.reject(error);
+  },
+);
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...options,
-        headers,
-    });
+const api = {
+  auth: {
+    login: (data) => apiClient.post("/api/auth/admin/login", data),
+    logout: () => apiClient.post("/api/auth/logout"),
+    updateProfile: (data) => apiClient.patch("/api/admin/profile", data),
+  },
+  // Dashboard & Stats
+  dashboard: {
+    getStats: () => apiClient.get("/api/admin/stats"),
+  },
 
-    // Handle 401 Unauthorized - redirect to login
-    if (response.status === 401) {
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminUser');
-        window.location.href = '/login';
-        throw new Error('Unauthorized - redirecting to login');
-    }
+  // Bookings & Appointments
+  bookings: {
+    getAll: () => apiClient.get("/api/admin/bookings"),
+    create: (data) => apiClient.post("/api/admin/bookings", data), // Admin Walk-in
+    update: (id, data) => apiClient.patch(`/api/admin/bookings/${id}`, data), // Reschedule/Reassign
+    cancel: (id) => apiClient.patch(`/api/admin/bookings/${id}/cancel`), // Admin Cancel
+  },
 
-    return response;
-};
+  // Services
+  services: {
+    getAll: () => apiClient.get("/api/admin/services"),
+    create: (data) => apiClient.post("/api/admin/services", data),
+    update: (id, data) => apiClient.patch(`/api/admin/services/${id}`, data),
+    delete: (id) => apiClient.delete(`/api/admin/services/${id}`),
+  },
 
-// API methods
-export const api = {
-    // Generic methods
-    get: (endpoint, options = {}) => authFetch(endpoint, { method: 'GET', ...options }),
-    post: (endpoint, data, options = {}) => authFetch(endpoint, { method: 'POST', body: JSON.stringify(data), ...options }),
-    put: (endpoint, data, options = {}) => authFetch(endpoint, { method: 'PUT', body: JSON.stringify(data), ...options }),
-    delete: (endpoint, options = {}) => authFetch(endpoint, { method: 'DELETE', ...options }),
+  // Products
+  products: {
+    getAll: () => apiClient.get("/api/admin/products"),
+    create: (data) => apiClient.post("/api/admin/products", data),
+    update: (id, data) => apiClient.patch(`/api/admin/products/${id}`, data),
+    delete: (id) => apiClient.delete(`/api/admin/products/${id}`),
+  },
 
-    // Bookings
-    bookings: {
-        getAll: () => api.get('/api/admin/bookings'),
-    },
+  // Staff Management
+  staff: {
+    getAll: () => apiClient.get("/api/admin/staff"),
+    create: (data) => apiClient.post("/api/admin/staff", data),
+    update: (id, data) => apiClient.patch(`/api/admin/staff/${id}`, data),
+    delete: (id) => apiClient.delete(`/api/admin/staff/${id}`),
+    getSchedule: (id) => apiClient.get(`/api/admin/staff/${id}/schedule`),
+  },
 
-    // Services
-    services: {
-        getAll: () => api.get('/api/admin/services'),
-        create: (data) => api.post('/api/admin/services', data),
-        update: (id, data) => api.put(`/api/admin/services/${id}`, data),
-        delete: (id) => api.delete(`/api/admin/services/${id}`),
-    },
+  // Calendar Control & Slot Management
+  slots: {
+    block: (data) => apiClient.post("/api/admin/blocked-slots", data),
+    unblock: (id) => apiClient.delete(`/api/admin/blocked-slots/${id}`),
+  },
 
-    // Products
-    products: {
-        getAll: () => api.get('/api/admin/products'),
-        create: (data) => api.post('/api/admin/products', data),
-        update: (id, data) => api.put(`/api/admin/products/${id}`, data),
-        delete: (id) => api.delete(`/api/admin/products/${id}`),
-    },
+  // Marketing (Offers & Categories)
+  offers: {
+    getAll: () => apiClient.get("/api/admin/offers"),
+    create: (data) => apiClient.post("/api/admin/offers", data),
+    delete: (id) => apiClient.delete(`/api/admin/offers/${id}`),
+    update: (id, data) => apiClient.patch(`/api/admin/offers/${id}`, data),
+  },
+  categories: {
+    getAll: () => apiClient.get("/api/admin/categories"),
+    create: (data) => apiClient.post("/api/admin/categories", data),
+    update: (id, data) => apiClient.patch(`/api/admin/categories/${id}`, data),
+    delete: (id) => apiClient.delete(`/api/admin/categories/${id}`),
+  },
 
-    // Offers
-    offers: {
-        getAll: () => api.get('/api/admin/offers'),
-        create: (data) => api.post('/api/admin/offers', data),
-        delete: (id) => api.delete(`/api/admin/offers/${id}`),
-    },
+  // User & Profile & notices
+  users: {
+    promote: (email) => apiClient.post("/api/admin/promote-user", { email }),
+    demote: (email) => apiClient.post("/api/admin/demote-user", { email }),
+  },
+  profile: {
+    update: (data) => apiClient.patch("/api/admin/profile", data),
+  },
+  notices: {
+    getAll: () => apiClient.get("/api/admin/notices"),
+    create: (data) => apiClient.post("/api/admin/notices", data),
+    delete: (id) => apiClient.delete(`/api/admin/notices/${id}`),
+  },
 
-    // Categories
-    categories: {
-        getAll: () => api.get('/api/admin/categories'),
-        create: (data) => api.post('/api/admin/categories', data),
-        update: (id, data) => api.put(`/api/admin/categories/${id}`, data),
-        delete: (id) => api.delete(`/api/admin/categories/${id}`),
-    },
-
-    // Profile
-    profile: {
-        get: () => api.get('/api/admin/profile'),
-    },
-
-    // Utilities
-    images: {
-        search: (query) => api.get(`/api/admin/search-images?query=${encodeURIComponent(query)}`),
-    },
+  // Utilities (pixabay image search)
+  images: {
+    search: (query) =>
+      apiClient.get(`/api/admin/search-images?query=${encodeURIComponent(query)}`),
+  },
 };
 
 export default api;

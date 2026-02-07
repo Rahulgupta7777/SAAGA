@@ -33,6 +33,10 @@ import {
   getAllNotices,
   updateNotice,
   deleteNotice,
+  getAllOffers,
+  createOffer,
+  deleteOffer,
+  updateOffer,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -71,6 +75,12 @@ router.get("/staff/:id/schedule", getStaffSchedule);
 // Blocked Slots
 router.post("/blocked-slots", blockSlot);
 router.delete("/blocked-slots/:id", unblockSlot);
+
+// Offers
+router.get("/offers", getAllOffers);
+router.post("/offers", createOffer);
+router.delete("/offers/:id", deleteOffer);
+router.patch("/offers/:id", updateOffer);
 
 // Categories
 router.get("/categories", getAllCategories);

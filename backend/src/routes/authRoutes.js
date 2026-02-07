@@ -1,5 +1,5 @@
 import express from "express";
-import { sendOtp, verifyOtp, portalLogin } from "../controllers/authController.js";
+import { sendOtp, verifyOtp, portalLogin, portalLogout } from "../controllers/authController.js";
 import rateLimit from "express-rate-limit";
 
 const router = express.Router();
@@ -21,5 +21,6 @@ router.post("/verify-otp", verifyOtp);
 
 // Admin Auth
 router.post("/admin/login", portalLogin);
+router.post("/admin/logout", portalLogout);
 
 export default router;

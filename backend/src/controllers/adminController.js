@@ -9,6 +9,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import Notice from "../models/natice.model.js";
 import axios from "axios";
+import Offer from "../models/offer.model.js";
 
 // --- Services ---
 export const getAllServices = async (req, res) => {
@@ -603,6 +604,47 @@ export const deleteNotice = async (req, res) => {
   try {
     await Notice.findByIdAndDelete(req.params.id);
     res.json({ message: "Notice removed" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// offers 
+export const getAllOffers = async (req, res) => {
+  try {
+    const offers = await Offer.find({ }).sort({ createdAt: -1 });
+    res.json(offers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const createOffer = async (req, res) => {
+  try {
+    const offer = await Offer.create(req.body);
+    res.status(201).json(offer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateOffer = async (req, res) => {
+  try {
+    const offer = await Offer.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+    res.status(200).json(offer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteOffer = async (req, res) => {
+  try {
+    await Offer.findByIdAndUpdate(req.params.id, { isActive: false });
+    res.status(200).json({ message: "Offer disabled" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -1,15 +1,11 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 
-// 1. Verify Token
+// Verify Token
 export const verifyToken = async (req, res, next) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
+  const token = req.cookies.token
+  if (token) {
     try {
-      token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       req.user = await User.findById(decoded.id).select("-password");
@@ -25,7 +21,7 @@ export const verifyToken = async (req, res, next) => {
   }
 };
 
-// 2. Verify Admin
+// Verify Admin
 export const verifyAdmin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
     next();
@@ -34,6 +30,7 @@ export const verifyAdmin = (req, res, next) => {
   }
 };
 
+// Verify Staff
 export const verifyStaff = (req, res, next) => {
   if (req.user && (req.user.role === "admin" || req.user.role === "staff")) {
     next();
