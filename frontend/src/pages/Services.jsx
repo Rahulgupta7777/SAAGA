@@ -2,19 +2,16 @@ import { useState, useEffect } from "react";
 import { Check, Plus, Loader2 } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import BookingModal from "../components/booking/BookingModal";
-import waxImage from "../assets/wax_service.png";
-import facialImage from "../assets/facial_service.png";
 import api from "../../utils/api.js";
 
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../context/BookingContext";
 
 const ServicesFull = () => {
+  const { cart, addToCart, removeFromCart, activeBooking } = useBooking();
   const [activeCategory, setActiveCategory] = useState("");
-  const [selectedServices, setSelectedServices] = useState([]);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
-  const { activeBooking } = useBooking();
   const navigate = useNavigate();
 
   const [categoryImages, setCategoryImages] = useState({});
@@ -153,24 +150,23 @@ const ServicesFull = () => {
   // Toggle Service Selection
   const toggleService = (item, variant = null, priceOverride = null) => {
     const itemName = variant ? `${item.name} (${variant})` : item.name;
+    // const serviceId = item._id || item.id;
 
-    if (selectedServices.some((s) => s.name === itemName)) {
-      setSelectedServices(selectedServices.filter((s) => s.name !== itemName));
+    if (cart.services.some((s) => s.name === itemName)) {
+      const itemToRemove = cart.services.find(s => s.name === itemName);
+      removeFromCart(itemToRemove._id || itemToRemove.id, "service");
     } else {
-      setSelectedServices([
-        ...selectedServices,
-        {
-          ...item,
-          name: itemName,
-          price: priceOverride || item.price,
-        },
-      ]);
+      addToCart({
+        ...item,
+        name: itemName,
+        price: priceOverride || item.price,
+      }, "service");
     }
   };
 
   const isSelected = (item, variant = null) => {
     const itemName = variant ? `${item.name} (${variant})` : item.name;
-    return selectedServices.some((s) => s.name === itemName);
+    return cart.services.some((s) => s.name === itemName);
   };
 
   if (loading) {
@@ -208,25 +204,34 @@ const ServicesFull = () => {
       <BookingModal
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
-        selectedServices={selectedServices}
+        selectedServices={cart.services}
+        selectedProducts={cart.products}
       />
 
       {/* Floating Action Bar */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-brown-900/10 p-4 md:p-6 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-in-out ${selectedServices.length > 0 ? "translate-y-0" : "translate-y-full"}`}
+        className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-brown-900/10 p-4 md:p-6 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-in-out ${cart.services.length > 0 || cart.products.length > 0 ? "translate-y-0" : "translate-y-full"}`}
       >
         <div className="max-w-360 mx-auto flex justify-between items-center gap-4">
           <div className="hidden md:block">
             <span className="text-sm font-bold text-brown-900 uppercase tracking-widest block mb-1">
-              Your Selection
+              Your Selection ({cart.services.length + cart.products.length})
             </span>
             <div className="flex gap-2 overflow-x-auto pb-1 max-w-xl">
-              {selectedServices.map((s, i) => (
+              {cart.services.map((s, i) => (
                 <span
-                  key={i}
+                  key={`service-${i}`}
                   className="text-sm text-brown-600 bg-brown-50 px-2 py-1 rounded inline-block whitespace-nowrap"
                 >
                   {s.name}
+                </span>
+              ))}
+              {cart.products.map((p, i) => (
+                <span
+                  key={`product-${i}`}
+                  className="text-sm text-brown-600 bg-brown-50 px-2 py-1 rounded inline-block whitespace-nowrap"
+                >
+                  {p.name}
                 </span>
               ))}
             </div>
@@ -235,7 +240,7 @@ const ServicesFull = () => {
           <div className="flex items-center gap-4 w-full md:w-auto">
             <div className="md:hidden flex-1">
               <span className="text-sm font-bold text-brown-900 block">
-                {selectedServices.length} Services Selected
+                {cart.services.length + cart.products.length} Services Selected
               </span>
             </div>
             <button
@@ -262,10 +267,11 @@ const ServicesFull = () => {
                 <button
                   key={service.id}
                   onClick={() => scrollToCategory(service.id)}
-                  className={`text-left px-5 py-3 rounded-lg text-base tracking-wide transition-all duration-300 font-serif border border-transparent flex justify-between items-center group ${activeCategory === service.id
-                    ? "bg-brown-900 text-white shadow-md translate-x-2"
-                    : "text-brown-600 hover:bg-brown-900/5 hover:text-brown-900"
-                    }`}
+                  className={`text-left px-5 py-3 rounded-lg text-base tracking-wide transition-all duration-300 font-serif border border-transparent flex justify-between items-center group ${
+                    activeCategory === service.id
+                      ? "bg-brown-900 text-white shadow-md translate-x-2"
+                      : "text-brown-600 hover:bg-brown-900/5 hover:text-brown-900"
+                  }`}
                 >
                   {service.category}
                   {activeCategory === service.id && (
@@ -283,10 +289,11 @@ const ServicesFull = () => {
               <button
                 key={service.id}
                 onClick={() => scrollToCategory(service.id)}
-                className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold tracking-wide border transition-all duration-300 ${activeCategory === service.id
-                  ? "bg-brown-900 text-white border-brown-900 shadow-md"
-                  : "bg-white border-brown-900/10 text-brown-700"
-                  }`}
+                className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold tracking-wide border transition-all duration-300 ${
+                  activeCategory === service.id
+                    ? "bg-brown-900 text-white border-brown-900 shadow-md"
+                    : "bg-white border-brown-900/10 text-brown-700"
+                }`}
               >
                 {service.category}
               </button>
@@ -334,10 +341,11 @@ const ServicesFull = () => {
 
                           {item.price && item.price.includes("/") ? (
                             <div
-                              className={`relative overflow-hidden rounded-full border border-brown-900 group/split w-27.5 h-8.5 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 ${isSelected(item, "M") || isSelected(item, "F")
-                                ? "bg-brown-900 border-brown-900"
-                                : "bg-transparent border-brown-900 hover:bg-white"
-                                }`}
+                              className={`relative overflow-hidden rounded-full border border-brown-900 group/split w-27.5 h-8.5 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 ${
+                                isSelected(item, "M") || isSelected(item, "F")
+                                  ? "bg-brown-900 border-brown-900"
+                                  : "bg-transparent border-brown-900 hover:bg-white"
+                              }`}
                             >
                               {/* Default Content: 'Add' */}
                               <div
@@ -364,13 +372,14 @@ const ServicesFull = () => {
                                     );
                                   }}
                                   className={`flex-1 h-full flex items-center justify-center transition-colors hover:bg-brown-100
-                                                                            ${isSelected(
-                                    item,
-                                    "M",
-                                  )
-                                      ? "bg-brown-900 text-white hover:bg-brown-800"
-                                      : "bg-white text-brown-900"
-                                    }`}
+                                                                            ${
+                                                                              isSelected(
+                                                                                item,
+                                                                                "M",
+                                                                              )
+                                                                                ? "bg-brown-900 text-white hover:bg-brown-800"
+                                                                                : "bg-white text-brown-900"
+                                                                            }`}
                                 >
                                   M{" "}
                                   {isSelected(item, "M") && (
@@ -388,13 +397,14 @@ const ServicesFull = () => {
                                     );
                                   }}
                                   className={`flex-1 h-full flex items-center justify-center transition-colors hover:bg-brown-100
-                                                                            ${isSelected(
-                                    item,
-                                    "F",
-                                  )
-                                      ? "bg-brown-900 text-white hover:bg-brown-800"
-                                      : "bg-white text-brown-900"
-                                    }`}
+                                                                            ${
+                                                                              isSelected(
+                                                                                item,
+                                                                                "F",
+                                                                              )
+                                                                                ? "bg-brown-900 text-white hover:bg-brown-800"
+                                                                                : "bg-white text-brown-900"
+                                                                            }`}
                                 >
                                   F{" "}
                                   {isSelected(item, "F") && (
@@ -407,12 +417,13 @@ const ServicesFull = () => {
                             <button
                               onClick={() => toggleService(item)}
                               className={`px-6 py-2 border text-xs tracking-wider uppercase font-bold rounded-full transition-all duration-300 flex items-center gap-2
-                                                                ${isSelected(
-                                item,
-                              )
-                                  ? "bg-brown-900 text-white border-brown-900"
-                                  : "bg-transparent border-brown-900 text-brown-900 hover:bg-brown-900 hover:text-white"
-                                }
+                                                                ${
+                                                                  isSelected(
+                                                                    item,
+                                                                  )
+                                                                    ? "bg-brown-900 text-white border-brown-900"
+                                                                    : "bg-transparent border-brown-900 text-brown-900 hover:bg-brown-900 hover:text-white"
+                                                                }
                                                             `}
                             >
                               {isSelected(item) ? (
@@ -463,11 +474,12 @@ const ServicesFull = () => {
 
                                 {item.price && item.price.includes("/") ? (
                                   <div
-                                    className={`relative overflow-hidden rounded-full border border-brown-900 group/split w-27.5 h-8.5 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 ${isSelected(item, "M") ||
+                                    className={`relative overflow-hidden rounded-full border border-brown-900 group/split w-27.5 h-8.5 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 ${
+                                      isSelected(item, "M") ||
                                       isSelected(item, "F")
-                                      ? "bg-brown-900 border-brown-900"
-                                      : "bg-transparent border-brown-900 hover:bg-white"
-                                      }`}
+                                        ? "bg-brown-900 border-brown-900"
+                                        : "bg-transparent border-brown-900 hover:bg-white"
+                                    }`}
                                   >
                                     {/* Default Content: 'Add' */}
                                     <div
@@ -494,13 +506,14 @@ const ServicesFull = () => {
                                           );
                                         }}
                                         className={`flex-1 h-full flex items-center justify-center transition-colors hover:bg-brown-100
-                                                                                    ${isSelected(
-                                          item,
-                                          "M",
-                                        )
-                                            ? "bg-brown-900 text-white hover:bg-brown-800"
-                                            : "bg-white text-brown-900"
-                                          }`}
+                                                                                    ${
+                                                                                      isSelected(
+                                                                                        item,
+                                                                                        "M",
+                                                                                      )
+                                                                                        ? "bg-brown-900 text-white hover:bg-brown-800"
+                                                                                        : "bg-white text-brown-900"
+                                                                                    }`}
                                       >
                                         M{" "}
                                         {isSelected(item, "M") && (
@@ -518,13 +531,14 @@ const ServicesFull = () => {
                                           );
                                         }}
                                         className={`flex-1 h-full flex items-center justify-center transition-colors hover:bg-brown-100
-                                                                                    ${isSelected(
-                                          item,
-                                          "F",
-                                        )
-                                            ? "bg-brown-900 text-white hover:bg-brown-800"
-                                            : "bg-white text-brown-900"
-                                          }`}
+                                                                                    ${
+                                                                                      isSelected(
+                                                                                        item,
+                                                                                        "F",
+                                                                                      )
+                                                                                        ? "bg-brown-900 text-white hover:bg-brown-800"
+                                                                                        : "bg-white text-brown-900"
+                                                                                    }`}
                                       >
                                         F{" "}
                                         {isSelected(item, "F") && (
@@ -537,12 +551,13 @@ const ServicesFull = () => {
                                   <button
                                     onClick={() => toggleService(item)}
                                     className={`px-6 py-2 border text-xs tracking-wider uppercase font-bold rounded-full transition-all duration-300 flex items-center gap-2
-                                                                            ${isSelected(
-                                      item,
-                                    )
-                                        ? "bg-brown-900 text-white border-brown-900"
-                                        : "bg-transparent border-brown-900 text-brown-900 hover:bg-brown-900 hover:text-white"
-                                      }
+                                                                            ${
+                                                                              isSelected(
+                                                                                item,
+                                                                              )
+                                                                                ? "bg-brown-900 text-white border-brown-900"
+                                                                                : "bg-transparent border-brown-900 text-brown-900 hover:bg-brown-900 hover:text-white"
+                                                                            }
                                                                         `}
                                   >
                                     {isSelected(item) ? (

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion,AnimatePresence } from "framer-motion";
+import { motion , AnimatePresence } from "framer-motion";
 
 import hairImg from "../../assets/hair_service.png";
 import blowDryImg from "../../assets/blowout_service.png";
