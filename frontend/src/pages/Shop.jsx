@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import api from "../../utils/api.js";
-import Navbar from "../components/layout/Navbar";
-import BookingModal from "../components/booking/BookingModal";
+import Navbar from "../components/layout/Navbar.jsx";
+import BookingModal from "../components/booking/BookingModal.jsx";
 import { ShoppingBag, ArrowRight, Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useBooking } from "../context/BookingContext.jsx";
 
 const Shop = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
@@ -23,6 +24,8 @@ const Shop = () => {
       selectedCategory === "All" || productCategory === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const { addToCart, cart } = useBooking();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -48,7 +51,8 @@ const Shop = () => {
       <BookingModal
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
-        selectedServices={[]}
+        selectedServices={cart.services}
+        selectedProducts={cart.products}
       />
 
       {/* Hero Section with Background Image - 50vh */}
@@ -93,10 +97,11 @@ const Shop = () => {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 backdrop-blur-sm border ${selectedCategory === cat
+                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 backdrop-blur-sm border ${
+                    selectedCategory === cat
                       ? "bg-white text-brown-900 border-white shadow-lg transform scale-105"
                       : "bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/40"
-                    }`}
+                  }`}
                 >
                   {cat}
                 </button>
@@ -135,7 +140,10 @@ const Shop = () => {
                   />
                   {/* Quick Add Button or Badge */}
                   <div className="absolute bottom-4 right-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100 z-20">
-                    <button className="bg-white text-brown-900 p-3 rounded-full shadow-lg hover:bg-brown-900 hover:text-white transition-colors">
+                    <button
+                      className="bg-white text-brown-900 p-3 rounded-full shadow-lg hover:bg-brown-900 hover:text-white transition-colors"
+                      onClick={() => addToCart(product, "product")}
+                    >
                       <ShoppingBag size={20} />
                     </button>
                   </div>
@@ -157,10 +165,11 @@ const Shop = () => {
                       </p>
                     </div>
                     <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${product.stock > 0
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        product.stock > 0
                           ? "bg-brown-50 text-brown-800 border border-brown-100"
                           : "bg-red-50 text-red-800 border border-red-100"
-                        }`}
+                      }`}
                     >
                       {product.stock > 0 ? "In Stock" : "Sold Out"}
                     </span>
@@ -175,7 +184,9 @@ const Shop = () => {
               <Search size={64} strokeWidth={1} />
             </div>
             <h3 className="text-3xl font-serif text-brown-900 mb-4">
-              {products.length === 0 ? "Collection Coming Soon" : "No matches found"}
+              {products.length === 0
+                ? "Collection Coming Soon"
+                : "No matches found"}
             </h3>
             <p className="text-brown-500 mb-8 max-w-md mx-auto leading-relaxed">
               {products.length === 0
