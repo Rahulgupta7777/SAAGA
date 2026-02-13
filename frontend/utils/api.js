@@ -46,8 +46,8 @@ const api = {
     getCategories: () => apiClient.get("/api/public/categories"),
     getStaff: () => apiClient.get("/api/public/staff"),
     // Dynamic Slot Fetching
-    getSlots: (date, serviceIds) =>
-      apiClient.get(`/api/public/slots?date=${date}&serviceIds=${serviceIds}`),
+    getSlots: (date, serviceIds) => apiClient.get(`/api/public/slots?date=${date}&serviceIds=${serviceIds}`),
+    verifyCoupon: (code) => apiClient.post("/api/public/verify-coupon", { code }),
   },
 
   // Auth Routes

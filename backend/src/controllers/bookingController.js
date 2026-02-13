@@ -6,6 +6,7 @@ import User from "../models/user.model.js";
 import Staff from "../models/staff.model.js";
 import { sendWhatsappOtp } from "../utils/WhatsApp.js"; // We might need a separate template for confirmation
 import mongoose from "mongoose";
+import Offer from "../models/offer.model.js";
 
 // Helper: Get Time Slots (10 AM - 8 PM)
 const generateTimeSlots = () => {
@@ -93,7 +94,27 @@ export const createBooking = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    let { userId, date, timeSlot, services, products, staffId } = req.body;
+    let { userId, date, timeSlot, services, products, staffId, couponCode } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const activeUserBooking = await Appointment.findOne({
+      userId: userId,
+      date: { $gte: startOfToday }, // Future or Today
+      status: { $in: ["confirmed", "booked", "pending"] } // Active Statuses
+    });
+
+    if (activeUserBooking) {
+      return res.status(409).json({ 
+        message: "You already have an upcoming appointment. Please complete it before booking a new one." 
+      });
+    }
 
     if (!staffId) {
       // Find a staff member who is active AND free at this time
@@ -107,10 +128,7 @@ export const createBooking = async (req, res) => {
       }).distinct("staff"); // Get list of busy staff IDs
 
       // Finding someone who is NOT in the busy list
-      const availableStaff = activeStaff.find(
-        (s) =>
-          !busyStaffIds.map((id) => id.toString()).includes(s._id.toString()),
-      );
+      const availableStaff = activeStaff.find((s) => !busyStaffIds.map((id) => id.toString()).includes(s._id.toString()));
 
       if (!availableStaff) {
         return res
@@ -142,42 +160,97 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Calculate totlal Price (Securely from Backend)
     let totalAmount = 0;
 
-    // Services
-    // if (!Array.isArray(services) || services.length === 0) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Services must be a non-empty array" });
-    // }
+    const hasGeneralMembership = user.subscriptions && user.subscriptions.some(
+      (sub) => sub.name === "Salon Membership" && sub.isActive && new Date(sub.expiry) > new Date()
+    );
+
+    // Process Services
     if (Array.isArray(services) && services.length > 0) {
       for (const item of services) {
-        const service = await Service.findOne({
-          _id: item.serviceId,
-          isActive: true,
-        });
+        const service = await Service.findOne({ _id: item.serviceId, isActive: true });
         if (!service) throw new Error(`Service not available: ${item.serviceId}`);
 
-        totalAmount +=
-          item.variant === "male" ? service.prices.male : service.prices.female;
+        let price = item.variant === "male" ? service.prices.male : service.prices.female; 
+
+        // CHECK SUBSCRIPTIONS
+        const hasSpecificSub = user.subscriptions && user.subscriptions.some(
+          (sub) => sub.isActive && 
+                   new Date(sub.expiry) > new Date() && 
+                   service.name.toLowerCase() === sub.name.toLowerCase() 
+        );
+
+        if (hasSpecificSub) {
+          price = 0; // Free if covered by specific subscription
+        } else if (hasGeneralMembership) {
+          price = price * 0.80; // Apply 20% discount 
+        }
+
+        totalAmount += price;
       }
     }
 
-    // Products
     if (products && products.length > 0) {
       for (const prodId of products) {
         const product = await Product.findOne({ _id: prodId, isActive: true });
         if (!product) throw new Error(`Product not available: ${prodId}`);
+        
         totalAmount += product.price;
-
-        await Product.findByIdAndUpdate(
-          prodId,
-          { $inc: { stock: -1 } },
-          { session },
-        );
+        await Product.findByIdAndUpdate(prodId, { $inc: { stock: -1 } }, { session });
       }
     }
+
+    if (couponCode) {
+      const offer = await Offer.findOne({ code: couponCode.toUpperCase(), isActive: true });
+      
+      // Validate Expiry
+      if (offer) {
+        const isExpired = offer.expiryDate && new Date(offer.expiryDate) < new Date();
+        
+        if (!isExpired) {
+          let discountAmount = 0;
+          if (offer.type === "percentage") {
+            discountAmount = (totalAmount * offer.value) / 100;
+          } else {
+            discountAmount = offer.value;
+          }
+          // Apply discount (also ensuring total doesn't go below 0)
+          totalAmount = Math.max(0, totalAmount - discountAmount);
+        }
+      }
+    }
+
+    
+    // let totalAmount = 0;
+
+    // if (Array.isArray(services) && services.length > 0) {
+    //   for (const item of services) {
+    //     const service = await Service.findOne({
+    //       _id: item.serviceId,
+    //       isActive: true,
+    //     });
+    //     if (!service) throw new Error(`Service not available: ${item.serviceId}`);
+
+    //     totalAmount +=
+    //       item.variant === "male" ? service.prices.male : service.prices.female;
+    //   }
+    // }
+
+    // // Products
+    // if (products && products.length > 0) {
+    //   for (const prodId of products) {
+    //     const product = await Product.findOne({ _id: prodId, isActive: true });
+    //     if (!product) throw new Error(`Product not available: ${prodId}`);
+    //     totalAmount += product.price;
+
+    //     await Product.findByIdAndUpdate(
+    //       prodId,
+    //       { $inc: { stock: -1 } },
+    //       { session },
+    //     );
+    //   }
+    // }
 
     const appointment = await Appointment.create(
       [
@@ -188,7 +261,7 @@ export const createBooking = async (req, res) => {
           services,
           products,
           staff: staffId,
-          totalAmount,
+          totalAmount: Math.round(totalAmount), // Round to avoid decimals
           status: "confirmed",
         },
       ],

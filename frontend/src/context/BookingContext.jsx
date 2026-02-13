@@ -9,6 +9,7 @@ export const BookingProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState({ services: [], products: [] });
   const [activeBooking, setActiveBooking] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null);
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -37,7 +38,6 @@ export const BookingProvider = ({ children }) => {
       const active = bookings.find((b) => {
         const bookingDate = new Date(b.date);
         const isActiveStatus = b.status !== "cancelled" && b.status !== "completed";
-        // Also check if it's in the future or today
         const isFuture = bookingDate >= now;
         return isActiveStatus && isFuture;
       });
@@ -59,12 +59,19 @@ export const BookingProvider = ({ children }) => {
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem("saaga_user", JSON.stringify(userData));
+
+    if (pendingAction === "openBooking") {
+      setPendingAction(null);
+      return true; // Signal that we can proceed with the booking action
+    }
+    return false;
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("saaga_user");
     setActiveBooking(null);
+    setCart({ services: [], products: [] });
   };
 
   const addToCart = (item, type = "service") => {
@@ -105,6 +112,8 @@ export const BookingProvider = ({ children }) => {
         clearCart,
         activeBooking,
         fetchActiveBooking,
+        pendingAction,
+        setPendingAction,
       }}
     >
       {children}

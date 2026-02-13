@@ -62,4 +62,38 @@ router.get("/categories", async (req, res) => {
   }
 });
 
+// 7. Verify Coupon Endpoint
+router.post("/verify-coupon", async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ message: "Code is required" });
+
+    // Finding active offer matching the code 
+    const offer = await Offer.findOne({ 
+      code: code.toUpperCase(), 
+      isActive: true 
+    });
+
+    if (!offer) {
+      return res.status(404).json({ message: "Invalid or inactive coupon code." });
+    }
+
+    // Check Expiry
+    if (offer.expiryDate && new Date(offer.expiryDate) < new Date()) {
+      return res.status(400).json({ message: "This coupon has expired." });
+    }
+
+    // Return offer details needed for calculation
+    return res.json({
+      code: offer.code,
+      type: offer.type, // "percentage" or "flat"
+      value: offer.value,
+      title: offer.title
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;
