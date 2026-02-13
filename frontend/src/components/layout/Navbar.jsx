@@ -6,14 +6,18 @@ import { useBooking } from "../../context/BookingContext";
 
 const Navbar = ({ showLogo = false, onOpenBooking }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { activeBooking } = useBooking();
+  const { activeBooking, user } = useBooking();
   const navigate = useNavigate();
 
   const handleBookingClick = () => {
+    if (!user) {
+      onOpenBooking(true); // Pass true to indicate we want to open booking after login
+      return;
+    }
     if (activeBooking) {
       navigate("/schedule");
     } else {
-      onOpenBooking();
+      onOpenBooking(false);
     }
   };
 
