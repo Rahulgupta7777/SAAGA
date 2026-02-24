@@ -111,6 +111,51 @@ const Shop = () => {
         </div>
       </div>
 
+      {/* Floating Action Bar */}
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-brown-900/10 p-4 md:p-6 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-in-out ${cart.services.length > 0 || cart.products.length > 0 ? "translate-y-0" : "translate-y-full"}`}
+      >
+        <div className="max-w-360 mx-auto flex justify-between items-center gap-4">
+          <div className="hidden md:block">
+            <span className="text-sm font-bold text-brown-900 uppercase tracking-widest block mb-1">
+              Your Selection ({cart.services.length + cart.products.length})
+            </span>
+            <div className="flex gap-2 overflow-x-auto pb-1 max-w-xl">
+              {cart.services.map((s, i) => (
+                <span
+                  key={`service-${i}`}
+                  className="text-sm text-brown-600 bg-brown-50 px-2 py-1 rounded inline-block whitespace-nowrap"
+                >
+                  {s.name}
+                </span>
+              ))}
+              {cart.products.map((p, i) => (
+                <span
+                  key={`product-${i}`}
+                  className="text-sm text-brown-600 bg-brown-50 px-2 py-1 rounded inline-block whitespace-nowrap"
+                >
+                  {p.name}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="md:hidden flex-1">
+              <span className="text-sm w-30 font-bold text-brown-900 block">
+                {cart.services.length + cart.products.length} Items Selected
+              </span>
+            </div>
+            <button
+              onClick={() => setIsBookingOpen(true)}
+              className="bg-brown-900 text-white px-8 py-4 rounded-full text-base font-medium tracking-wide hover:bg-brown-800 transition-colors shadow-lg w-full md:w-auto"
+            >
+              Checkout
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Content Section */}
       <div className="max-w-7xl mx-auto px-6 pb-20">
         {loading ? (
