@@ -1,4 +1,5 @@
 import { MapPin, Phone, Mail, Instagram, Facebook } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
@@ -85,8 +86,8 @@ const Footer = () => {
                 <div className="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/40">
                     <p>&copy; {new Date().getFullYear()} SAAGAA SALON. All rights reserved.</p>
                     <div className="flex gap-8">
-                        <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                        <Link to="/legal" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link to="/legal" className="hover:text-white transition-colors">Terms of Service</Link>
                     </div>
                 </div>
             </div>

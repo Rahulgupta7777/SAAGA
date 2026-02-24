@@ -11,7 +11,7 @@ const Hero = () => {
             SAAGAA
           </h1>
           <h2 className="font-sans text-3xl md:text-4xl lg:text-[3.5rem] font-light text-black leading-[1.2] mb-6 md:mb-10 tracking-[1px]">
-            unisex salon
+            The family salon
           </h2>
           <p
             className="text-base md:text-lg text-brown-900 mb-8 md:mb-16 tracking-[2px]"

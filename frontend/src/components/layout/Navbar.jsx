@@ -26,8 +26,8 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
       className={`flex justify-between md:justify-center items-center py-4 md:py-6 px-6 md:px-12 w-full max-w-full z-50 ${showLogo ? "border-b border-brown-900/10" : ""}`}
     >
       {/* Mobile Logo/Brand */}
-      <Link to="/" className="md:hidden font-serif text-2xl text-brown-900">
-        SAAGAA
+      <Link to="/" className="md:hidden flex items-center">
+        <img src="/new_logo_saaga.png" alt="SAAGA Logo" className="h-12 w-auto object-contain mix-blend-multiply" />
       </Link>
 
       {/* Desktop Menu */}
@@ -37,12 +37,9 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
         {showLogo && (
           <Link
             to="/"
-            className="font-serif text-3xl font-bold text-brown-900 flex items-center"
+            className="flex items-center"
           >
-            <span className="mr-[0.2px]">S</span>
-            <span>AA</span>
-            <span className="mx-[0.2px]">G</span>
-            <span>AA</span>
+            <img src="/new_logo_saaga.png" alt="SAAGA Logo" className="h-16 md:h-20 w-auto object-contain mix-blend-multiply" />
           </Link>
         )}
 
@@ -72,6 +69,12 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
             className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity"
           >
             locate us
+          </Link>
+          <Link
+            to="/legal"
+            className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity"
+          >
+            legal
           </Link>
           <button
             onClick={handleBookingClick}
@@ -129,6 +132,13 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
             className="text-brown-900 text-3xl font-serif"
           >
             Locate Us
+          </Link>
+          <Link
+            to="/legal"
+            onClick={() => setIsMenuOpen(false)}
+            className="text-brown-900 text-3xl font-serif"
+          >
+            Legal
           </Link>
           <button
             onClick={() => {

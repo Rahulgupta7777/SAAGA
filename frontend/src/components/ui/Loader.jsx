@@ -144,7 +144,7 @@ const Loader = ({ onComplete }) => {
               transition={{ delay: 0.7, duration: 0.8, ease: "easeOut" }}
             >
                 <p className="text-brown-500 text-sm md:text-xl font-medium tracking-[0.5em] uppercase whitespace-nowrap text-center px-2">
-                  Unisex Salon
+                  The Family Salon
                 </p>
             </motion.div>
           </motion.div>
