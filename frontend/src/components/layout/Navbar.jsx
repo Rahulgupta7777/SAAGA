@@ -27,7 +27,7 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
     >
       {/* Mobile Logo/Brand */}
       <Link to="/" className="md:hidden flex items-center">
-        <img src="/new_logo_saaga.png" alt="SAAGA Logo" className="h-12 w-auto object-contain mix-blend-multiply" />
+        <img src="/new_logo_saaga.png" alt="SAAGA Logo" className="h-16 w-auto object-contain mix-blend-multiply" />
       </Link>
 
       {/* Desktop Menu */}
@@ -39,7 +39,7 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
             to="/"
             className="flex items-center"
           >
-            <img src="/new_logo_saaga.png" alt="SAAGA Logo" className="h-16 md:h-20 w-auto object-contain mix-blend-multiply" />
+            <img src="/new_logo_saaga.png" alt="SAAGA Logo" className="h-22 md:h-29 w-auto object-contain mix-blend-multiply" />
           </Link>
         )}
 
@@ -69,12 +69,6 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
             className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity"
           >
             locate us
-          </Link>
-          <Link
-            to="/legal"
-            className="text-brown-900 text-base font-normal tracking-[0.5px] hover:opacity-80 transition-opacity"
-          >
-            legal
           </Link>
           <button
             onClick={handleBookingClick}
@@ -132,13 +126,6 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
             className="text-brown-900 text-3xl font-serif"
           >
             Locate Us
-          </Link>
-          <Link
-            to="/legal"
-            onClick={() => setIsMenuOpen(false)}
-            className="text-brown-900 text-3xl font-serif"
-          >
-            Legal
           </Link>
           <button
             onClick={() => {

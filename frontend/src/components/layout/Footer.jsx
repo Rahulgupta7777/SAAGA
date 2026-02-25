@@ -86,6 +86,7 @@ const Footer = () => {
                 <div className="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/40">
                     <p>&copy; {new Date().getFullYear()} SAAGAA SALON. All rights reserved.</p>
                     <div className="flex gap-8">
+                        <Link to="/legal" className="hover:text-white transition-colors">Legal Information</Link>
                         <Link to="/legal" className="hover:text-white transition-colors">Privacy Policy</Link>
                         <Link to="/legal" className="hover:text-white transition-colors">Terms of Service</Link>
                     </div>
