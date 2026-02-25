@@ -28,17 +28,46 @@ const Shop = () => {
   const { addToCart, cart } = useBooking();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await api.public.getShopProducts();
-        setProducts(res.data);
-      } catch (err) {
-        console.error("Failed to fetch products", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
+    // Hardcoded products list
+    setProducts([
+      // L'Oréal Professionnel - Shampoos
+      { _id: '1', name: "L'Oréal Professionnel Absolut Repair Shampoo", category: "Shampoos", price: 675, stock: 10, image: "/absolut_repair_shampoo.png", brand: "L'Oréal Professionnel" },
+      { _id: '2', name: "L'Oreal Professionnel Vitamino Color Shampoo 300ml", category: "Shampoos", price: 691, stock: 10, image: "/vitamino_color_shampoo.png", brand: "L'Oréal Professionnel" },
+      { _id: '3', name: "L'Oreal Professionnel Scalp Advanced Anti-Oiliness Shampoo", category: "Shampoos", price: 880, stock: 10, image: "/loreal_scalp_advanced_oiliness.png", brand: "L'Oréal Professionnel" },
+      { _id: '4', name: "L'Oreal Professionnel Scalp Advanced Anti-Dandruff Shampoo", category: "Shampoos", price: 895, stock: 10, image: "/loreal_scalp_advanced_dandruff.png", brand: "L'Oréal Professionnel" },
+      { _id: '5', name: "Loreal Density Advance Shampoo", category: "Shampoos", price: 518, stock: 10, image: "/loreal_density_advance.png", brand: "L'Oréal Professionnel" },
+      { _id: '6', name: "L'Oreal Professionnel Xtenso Care Shampoo", category: "Shampoos", price: 610, stock: 10, image: "/loreal_xtenso_shampoo.png", brand: "L'Oréal Professionnel" },
+
+      // L'Oréal Professionnel - Conditioners & Masks
+
+      // L'Oréal Professionnel - Serums, Oils & Treatments
+
+      // L'Oréal Professionnel - Styling & Special Products
+
+      // GK Hair (Global Keratin) - Shampoos
+      { _id: '22', name: "Moisturizing Shampoo", category: "Shampoos", price: 1200, stock: 10, image: "/gk_moisturizing_shampoo.png", brand: "GK Hair" },
+      { _id: '23', name: "Balancing Shampoo", category: "Shampoos", price: 1200, stock: 10, image: "/gk_balancing_shampoo.png", brand: "GK Hair" },
+      { _id: '24', name: "Anti-Dandruff Shampoo", category: "Shampoos", price: 1300, stock: 10, image: "/gk_anti_dandruff_shampoo.png", brand: "GK Hair" },
+
+      // GK Hair (Global Keratin) - Conditioners & Masks
+
+      // GK Hair (Global Keratin) - Serums & Leave-Ins
+      
+      // GK Hair (Global Keratin) - Color & Treatments
+
+      // Schwarzkopf Professional - Shampoos
+      { _id: '38', name: "BC Bonacure Repair Rescue Shampoo", category: "Shampoos", price: 950, stock: 10, image: "/bc_repair_rescue_shampoo.png", brand: "Schwarzkopf" },
+      { _id: '39', name: "BC Moisture Kick Shampoo", category: "Shampoos", price: 950, stock: 10, image: "/bc_moisture_kick_shampoo.png", brand: "Schwarzkopf" },
+
+      // Schwarzkopf Professional - Conditioners & Masks
+      { _id: '43', name: "Keratin Smooth Perfect Mask", category: "Conditioners & Masks", price: 1150, stock: 10, image: "/product_image_replacement.png", brand: "Schwarzkopf" },
+      { _id: '44', name: "Color Freeze Treatment", category: "Conditioners & Masks", price: 1150, stock: 10, image: "/color_freeze_treatment.png", brand: "Schwarzkopf" },
+
+      // Schwarzkopf Professional - Hair Color (Salon Use)
+
+      // Schwarzkopf Professional - Styling Range (OSiS+)
+    ]);
+    setLoading(false);
   }, []);
 
   return (
