@@ -9,22 +9,7 @@ const apiClient = axios.create({
   },
 });
 
-// //Request Interceptor: Auto-attach Token
-// apiClient.interceptors.request.use(
-//   (config) => {
-//     const savedUser = localStorage.getItem("saaga_user");
-//     if (savedUser) {
-//       const { token } = JSON.parse(savedUser);
-//       if (token) {
-//         config.headers.Authorization = `Bearer ${token}`;
-//       }
-//     }
-//     return config;
-//   },
-//   (error) => Promise.reject(error),
-// );
-
-// 3. Auth Errors Handler
+//  Auth Errors Handler
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
