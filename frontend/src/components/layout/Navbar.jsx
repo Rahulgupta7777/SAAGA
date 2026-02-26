@@ -23,11 +23,15 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
 
   return (
     <nav
-      className={`flex justify-between md:justify-center items-center py-4 md:py-6 px-6 md:px-12 w-full max-w-full z-50 ${showLogo ? "border-b border-brown-900/10" : ""}`}
+      className={`flex justify-between md:justify-center items-center py-4 md:py-6 px-6 md:pr-12 w-full max-w-full z-50 ${showLogo ? "border-b border-brown-900/10" : ""}`}
     >
       {/* Mobile Logo/Brand */}
       <Link to="/" className="md:hidden flex items-center">
-        <img src="/new_logo_saaga.png" alt="SAAGA Logo" className="h-16 w-auto object-contain mix-blend-multiply" />
+        <img
+          src="/Saagaa-icon2.png"
+          alt="SAAGA Logo"
+          className="h-16 w-auto pt-1.5 object-contain mix-blend-multiply"
+        />
       </Link>
 
       {/* Desktop Menu */}
@@ -35,16 +39,17 @@ const Navbar = ({ showLogo = false, onOpenBooking }) => {
         className={`hidden md:flex items-center w-full ${showLogo ? "justify-between" : "justify-center gap-16 lg:gap-24"}`}
       >
         {showLogo && (
-          <Link
-            to="/"
-            className="flex items-center"
-          >
-            <img src="/new_logo_saaga.png" alt="SAAGA Logo" className="h-22 md:h-29 w-auto object-contain mix-blend-multiply" />
+          <Link to="/" className="flex items-center">
+            <img
+              src="/Saagaa-icon5.png"
+              alt="SAAGA Logo"
+              className="h-15 md:h-15 pt-1.5 w-auto object-contain mix-blend-multiply"
+            />
           </Link>
         )}
 
         <div
-          className={`flex items-center ${showLogo ? "gap-12" : "gap-16 lg:gap-24"}`}
+          className={`flex items-center ${showLogo ? "gap-8 lg:gap-18" : "gap-16 lg:gap-24"}`}
         >
           <Link
             to="/services"

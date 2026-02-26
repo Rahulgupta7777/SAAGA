@@ -16,6 +16,7 @@ apiClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // If token expires, auto-logout 
       localStorage.removeItem("saaga_user");
+      
     }
     return Promise.reject(error);
   },

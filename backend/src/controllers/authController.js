@@ -31,6 +31,17 @@ export const sendOtp = async (req, res) => {
   }
 };
 
+const setTokenCookie = (res, token) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days
+  });
+};
+
 // Verify OTP & Login (Customer)
 export const verifyOtp = async (req, res) => {
   const { phone, otp, name } = req.body;
@@ -65,16 +76,16 @@ export const verifyOtp = async (req, res) => {
   }
 };
 
-const setTokenCookie = (res, token) => {
-  const isProduction = process.env.NODE_ENV === "production";
+// const setTokenCookie = (res, token) => {
+//   const isProduction = process.env.NODE_ENV === "production";
 
-  res.cookie("token", token, {
-    httpOnly: true, 
-    secure: isProduction, 
-    sameSite: isProduction ? "none" : "lax", 
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days
-  });
-};
+//   res.cookie("token", token, {
+//     httpOnly: true, 
+//     secure: isProduction, 
+//     sameSite: isProduction ? "none" : "lax", 
+//     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days
+//   });
+// };
 
 // Admin/Staff Login (Email/Pass)
 export const portalLogin = async (req, res) => {

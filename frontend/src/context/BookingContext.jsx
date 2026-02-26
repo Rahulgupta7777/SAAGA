@@ -32,7 +32,7 @@ export const BookingProvider = ({ children }) => {
       const res = await api.bookings.getMyBookings();
       const bookings = Array.isArray(res.data) ? res.data : [];
 
-      console.log("All Bookings for user:", bookings);
+      // console.log("All Bookings for user:", bookings);
 
       const now = new Date();
       now.setHours(0, 0, 0, 0);
